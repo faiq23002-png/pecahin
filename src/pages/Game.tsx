@@ -17,6 +17,7 @@ import { PageBoothHeader, AwningScallops } from "@/components/MarketBoothHeader"
 import { IconLock, IconBack } from "@/components/icons";
 import { BottomNav } from "@/components/BottomNav";
 import { Awning, HangingSign } from "@/components/MarketProps";
+import { GameLoadingScreen } from "@/components/GameLoadingScreen";
 
 const ROUNDS = 10;
 const BUAH: ObjKind[] = ["semangka", "jeruk", "kue-tart", "pizza", "roti", "cokelat", "keju", "kue-batang"];
@@ -351,9 +352,25 @@ export default function Game({ gameId }: { gameId: string }) {
     }
   }, [gameId]);
 
-  const terkunci = (gameId === "gCampuran" ? !semuaSelesai(progress) : !!game?.materiId && !progress[game.materiId]?.selesai) && !modeJuri;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+  }, [gameId]);
 
   if (!game) return null;
+
+  if (loading) {
+    return (
+      <GameLoadingScreen
+        gameTitle={game.nama}
+        durationMs={2800}
+        onLoaded={() => setLoading(false)}
+      />
+    );
+  }
+
+  const terkunci = (gameId === "gCampuran" ? !semuaSelesai(progress) : !!game?.materiId && !progress[game.materiId]?.selesai) && !modeJuri;
 
   if (terkunci) {
     return (

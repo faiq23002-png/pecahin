@@ -6,10 +6,9 @@ import React, { useState } from "react";
 import { useRouter } from "@/lib/router-context";
 import { useApp } from "@/lib/profil-context";
 import { Mascot } from "@/components/Mascot";
-import { PrimaryButton } from "@/components/ui";
 import { sfx } from "@/lib/audio";
 import type { Gender } from "@/lib/types";
-import { AwningScallops } from "@/components/MarketBoothHeader";
+import { Awning, HangingSign } from "@/components/MarketProps";
 
 export default function ProfilSetup() {
   const { navigate } = useRouter();
@@ -24,90 +23,95 @@ export default function ProfilSetup() {
     navigate("home");
   };
 
-  const karakterOptions: { g: Gender; nama: string; role: string; itemEmoji: string; theme: string }[] = [
+  const karakterOptions: { g: Gender; nama: string; role: string; itemEmoji: string }[] = [
     {
       g: "cewe",
       nama: "Pica",
       role: "Penjual Buah & Kue",
       itemEmoji: "🍰 🍉",
-      theme: "from-orange-500 to-amber-500",
     },
     {
       g: "cowo",
       nama: "Peco",
       role: "Penjual Sayur & Roti",
       itemEmoji: "🍞 🥦",
-      theme: "from-teal-600 to-emerald-600",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-krim pb-12 select-none">
-      {/* Header Canopy Stan Pendaftaran Pasar */}
-      <div className="relative overflow-hidden bg-slate-900 text-white shadow-xl rounded-b-[2.5rem]">
-        <div className="bg-market-awning-teal pt-4 pb-2 px-4 relative">
-          {/* Signboard Marquee Kayu */}
-          <div className="mx-auto max-w-xs bg-wood-sign rounded-2xl py-2 px-4 text-center border-2 border-amber-400 shadow-lg relative z-10 flex items-center justify-between">
-            <span className="text-amber-300 text-sm">🏬</span>
-            <div className="flex items-center gap-1.5 justify-center">
-              <span className="text-lg">🛒</span>
-              <span className="font-display font-black text-amber-100 tracking-wider text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                LOKET PASAR PECAH-IN
-              </span>
-            </div>
-            <span className="text-amber-300 text-sm">🍉</span>
-          </div>
-
-          <div className="mt-3 text-center relative z-10 bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-teal-400/40">
-            <h1 className="font-display text-xl font-black text-amber-300 drop-shadow">
-              Selamat Datang, Kasir Cilik! 👋
-            </h1>
-            <p className="text-xs font-semibold text-teal-100 mt-0.5">
-              Daftarkan nama & pilih stan karaktermulah sebelum mulai berjualan!
-            </p>
-          </div>
-        </div>
-
-        <AwningScallops lightCount={6} colorScheme="teal" />
+    <div className="min-h-screen pb-14 select-none relative">
+      {/* Background Pasar Beranda */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
+        <img
+          src="/bghome.jpg"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover object-center pointer-events-none"
+          style={{ transform: "translateZ(0)" }}
+        />
+        <div className="absolute inset-0 bg-slate-900/35 pointer-events-none" />
       </div>
 
-      <div className="mx-auto max-w-md px-4 mt-4 space-y-4">
-        {/* Form Papan Kapur / Nama Pemilik Lapak */}
-        <div className="rounded-3xl bg-white p-5 shadow-lg border-2 border-amber-400/60 relative overflow-hidden">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="bg-amber-400 text-amber-950 text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow">
+      {/* ================= GERBANG ATAP & JUDUL (FIXED TOP) ================= */}
+      <div className="sticky top-0 z-30 w-full select-none">
+        <Awning tone="teal" height={32} stripe={22} light="#fef08a" />
+        <div className="-mt-1 flex justify-center pb-1">
+          <HangingSign rope={12}>
+            <span className="font-display text-sm font-extrabold uppercase tracking-[0.18em] text-white [text-shadow:0_1px_0_rgba(0,0,0,.4)]">
+              Loket Masuk Pasar
+            </span>
+          </HangingSign>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-md px-4 mt-2 space-y-4">
+        {/* Banner Logo Judul PECAH-IN Transparan */}
+        <div className="flex flex-col items-center justify-center text-center py-1">
+          <img
+            src="/logo-pecahin.png"
+            alt="PECAH-IN"
+            className="w-full max-w-[320px] h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.65)] animate-float"
+          />
+          <p className="mt-1 text-xs font-extrabold text-amber-200 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+            Petualangan Belajar Pecahan di Pasar Tradisional! 🍉🛒
+          </p>
+        </div>
+
+        {/* Form Papan Nama Pemilik Lapak */}
+        <div className="rounded-3xl bg-white/95 p-5 shadow-xl border-2 border-ink">
+          <div className="flex items-center justify-between mb-2">
+            <span className="wood-plank text-white text-xs font-extrabold px-3 py-1 rounded-lg border border-ink shadow-[0_2px_0_#1e293b]">
               🏷️ Papan Nama Lapak
             </span>
             <span className="text-xs font-bold text-slate-500">Form Kasir</span>
           </div>
 
-          <label className="block font-display text-base font-extrabold text-slate-800">
-            Siapa Nama Pemilik Lapak?
+          <label className="block mt-2 font-display text-base font-extrabold text-ink">
+            Siapa Nama Panggilanmu?
           </label>
           <div className="relative mt-2">
             <span className="absolute left-3.5 top-3.5 text-lg">📝</span>
             <input
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              placeholder="Ketik nama panggilanmu di sini..."
-              className="w-full rounded-2xl border-2 border-slate-200 bg-slate-50 pl-11 pr-4 py-3 text-base font-bold text-ink focus:border-teal-600 focus:bg-white transition shadow-inner"
+              placeholder="Ketik namamu di sini..."
+              className="w-full rounded-2xl border-2 border-ink bg-slate-50 pl-11 pr-4 py-3 text-base font-bold text-ink focus:border-teal-600 focus:bg-white transition shadow-inner"
               maxLength={20}
             />
           </div>
         </div>
 
         {/* Pemilihan Stan Karakter (Pica vs Peco) */}
-        <div className="rounded-3xl bg-white p-5 shadow-lg border-2 border-teal-500/40">
+        <div className="rounded-3xl bg-white/95 p-5 shadow-xl border-2 border-ink">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <div className="font-display text-base font-black text-slate-800">
-                Pilih Stan Karakter Kasir:
+              <div className="font-display text-base font-extrabold text-ink">
+                Pilih Sahabat Kasir:
               </div>
-              <p className="text-xs font-semibold text-slate-500">
-                Pilih sahabat pecahan yang akan mendampingimu!
+              <p className="text-xs font-bold text-slate-600">
+                Karakter yang akan menemanimu di pasar
               </p>
             </div>
-            <span className="text-xl">🎪</span>
+            <span className="text-2xl">🎪</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -121,33 +125,32 @@ export default function ProfilSetup() {
                     setGender(c.g);
                     sfx("pop");
                   }}
-                  className={`relative rounded-3xl p-3.5 pt-6 text-center transition-all active:scale-95 flex flex-col items-center justify-between border-2 ${
+                  className={`relative rounded-2xl p-3.5 pt-5 text-center transition-all active:scale-95 flex flex-col items-center justify-between border-2 ${
                     selected
-                      ? "bg-gradient-to-b from-teal-50 to-amber-50 border-amber-400 ring-4 ring-amber-400/30 shadow-xl"
-                      : "bg-slate-50 border-slate-200 opacity-80 hover:opacity-100 shadow"
+                      ? "wood-plank border-ink text-white shadow-[0_4px_0_#1e293b] ring-2 ring-amber-300"
+                      : "bg-slate-50 border-slate-300 text-ink shadow hover:bg-slate-100"
                   }`}
                 >
                   {/* Selected Badge Overlay */}
                   {selected && (
-                    <span className="absolute top-2 right-2 z-20 bg-amber-400 text-amber-950 text-[11px] font-black px-2 py-0.5 rounded-full shadow-md border border-amber-500 tracking-wide flex items-center gap-1 animate-pulse">
+                    <span className="absolute -top-2.5 bg-amber-400 text-amber-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow border border-amber-600">
                       ✓ DIPILIH
                     </span>
                   )}
 
                   {/* Character Avatar inside Booth Counter */}
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-b from-amber-100 to-amber-300 border-2 border-amber-400 p-1 shadow-md grid place-items-center relative my-1 z-10">
-                    <Mascot gender={c.g} level={0} size={64} />
-                    <div className="absolute inset-x-0 bottom-0 h-2 bg-amber-800 border-t border-amber-600 rounded-b-xl" />
+                  <div className="w-18 h-18 rounded-2xl bg-white/90 border-2 border-ink p-1 shadow-md grid place-items-center relative my-1 z-10">
+                    <Mascot gender={c.g} level={0} size={58} />
                   </div>
 
                   <div className="mt-2 w-full">
-                    <div className="font-display text-base font-black text-slate-900">
+                    <div className={`font-display text-base font-extrabold ${selected ? "text-white [text-shadow:0_1px_1px_rgba(0,0,0,0.5)]" : "text-ink"}`}>
                       {c.nama}
                     </div>
-                    <div className="text-xs font-bold text-teal-700">
+                    <div className={`text-xs font-bold ${selected ? "text-amber-100" : "text-slate-600"}`}>
                       {c.role}
                     </div>
-                    <div className="text-xs mt-1 bg-white/80 py-0.5 rounded-lg font-bold border border-slate-200">
+                    <div className="text-xs mt-1.5 bg-white text-ink py-0.5 rounded-lg font-extrabold border border-ink shadow-xs">
                       {c.itemEmoji}
                     </div>
                   </div>
@@ -157,16 +160,17 @@ export default function ProfilSetup() {
           </div>
         </div>
 
-        {/* CTA Button Buka Lapak */}
-        <PrimaryButton
+        {/* CTA Button Buka Lapak dengan tema kayu / pasar */}
+        <button
+          type="button"
           onClick={mulai}
-          color="orange"
-          className="w-full py-4 text-lg shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
+          className="w-full wood-plank border-2 border-ink rounded-2xl py-4 px-6 font-display text-lg font-extrabold text-white shadow-[0_5px_0_#1e293b] active:translate-y-[2px] active:shadow-[0_2px_0_#1e293b] transition flex items-center justify-center gap-2 [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]"
         >
-          <span>🛒</span>
-          <span>BUKA LAPAK & MULAI BELANJA!</span>
-        </PrimaryButton>
+          <span className="text-xl">🛒</span>
+          <span>BUKA LAPAK & MULAI BELAJAR!</span>
+        </button>
       </div>
     </div>
   );
 }
+

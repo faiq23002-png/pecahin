@@ -8,6 +8,7 @@ import { IconLock, IconBack } from "@/components/icons";
 import { sfx } from "@/lib/audio";
 import { PageBoothHeader } from "@/components/MarketBoothHeader";
 import { Awning, HangingSign } from "@/components/MarketProps";
+import { GameLoadingScreen } from "@/components/GameLoadingScreen";
 
 import Home from "@/pages/Home";
 import ProfilSetup from "@/pages/ProfilSetup";
@@ -197,7 +198,7 @@ function GameHub() {
 function AppRoutes() {
   const { route } = useRouter();
   const { profil } = useApp();
-  if (!profil && route !== "profil") return <Home />;
+  if (!profil) return <ProfilSetup />;
 
   // Support route patterns with stage params: materi1-tahapCoba, materim1-tahapLatihan, etc.
   if (route.startsWith("materi1") || route.startsWith("materim1")) {
@@ -224,13 +225,13 @@ function AppRoutes() {
     case "game":
       return <GameHub />;
     case "game-bagi-rata":
-      return <Game gameId="g1" />;
+      return <Game key="g1" gameId="g1" />;
     case "game-banding-jodoh":
-      return <Game gameId="g2" />;
+      return <Game key="g2" gameId="g2" />;
     case "game-lapak-jualan":
-      return <Game gameId="g3" />;
+      return <Game key="g3" gameId="g3" />;
     case "game-campuran":
-      return <Game gameId="gCampuran" />;
+      return <Game key="gCampuran" gameId="gCampuran" />;
     case "rumah-maskot":
       return <RumahMaskot />;
     case "stiker":
@@ -249,10 +250,20 @@ function AppRoutes() {
 }
 
 export default function App() {
+  const [initialLoading, setInitialLoading] = React.useState(true);
+
   return (
     <AppProvider>
       <RouterProvider>
-        <AppRoutes />
+        {initialLoading ? (
+          <GameLoadingScreen
+            gameTitle="Membuka Pasar PECAH-IN..."
+            durationMs={3200}
+            onLoaded={() => setInitialLoading(false)}
+          />
+        ) : (
+          <AppRoutes />
+        )}
       </RouterProvider>
     </AppProvider>
   );

@@ -6,7 +6,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { InfoModalCard } from "@/components/InfoModalCard";
 import { Awning, Bunting, HangingSign, PriceTag, Counter, type AwningTone } from "@/components/MarketProps";
 import { sfx } from "@/lib/audio";
-import { IconChart, IconMaskot, IconFlame, IconRefresh, IconQuestion, IconSound, IconGear } from "@/components/icons";
+import { IconChart, IconMaskot, IconFlame, IconRefresh, IconQuestion, IconSound, IconGear, IconTrash } from "@/components/icons";
 
 type Item = {
   label: string;
@@ -51,8 +51,9 @@ function Stall({ it, onTap }: { it: Item; onTap: () => void }) {
 
 export default function Menu() {
   const { navigate } = useRouter();
-  const { profil, toggleSuara } = useApp();
+  const { profil, toggleSuara, resetAll } = useApp();
   const [bantuan, setBantuan] = useState(false);
+  const [showConfirmReset, setShowConfirmReset] = useState(false);
 
   const belajar: Item[] = [
     { label: "Rapor", sub: "Hasil belajarmu", icon: <IconChart size={24} />, tone: "teal", action: () => navigate("rapor") },
@@ -72,6 +73,14 @@ export default function Menu() {
       tag: { text: profil?.suaraOn ? "Nyala" : "Mati", color: profil?.suaraOn ? "green" : "white" },
     },
     { label: "Atur", sub: "Pengaturan aplikasi", icon: <IconGear size={24} />, tone: "violet", action: () => navigate("pengaturan") },
+    {
+      label: "Reset Data",
+      sub: "Hapus progres & akun",
+      icon: <IconTrash size={24} />,
+      tone: "red",
+      action: () => setShowConfirmReset(true),
+      tag: { text: "Reset", color: "red" },
+    },
   ];
 
   const tap = (it: Item) => () => {
@@ -146,6 +155,31 @@ export default function Menu() {
           <p>1. Buka <b>Lapak Pasar</b>: Ayo Belajar → Ayo Coba → Ayo Latihan.</p>
           <p>2. Kerjakan <b>10 soal</b> — progres tersimpan otomatis.</p>
           <p>3. Mainkan <b>Game</b> visual & tukar koin di menu <b>Toko</b>.</p>
+        </div>
+      </InfoModalCard>
+
+      <InfoModalCard
+        isOpen={showConfirmReset}
+        onClose={() => setShowConfirmReset(false)}
+        title="KONFIRMASI RESET"
+        icon="⚠️"
+        type="danger"
+        confirmText="Ya, Reset Semua"
+        cancelText="Batal"
+        onConfirm={() => {
+          setShowConfirmReset(false);
+          sfx("tap");
+          resetAll();
+          navigate("profil");
+        }}
+      >
+        <div className="text-center space-y-2">
+          <p className="font-bold text-slate-800 text-sm">
+            Yakin ingin menghapus seluruh progres belajar dan data akun?
+          </p>
+          <p className="text-xs text-red-600 font-semibold bg-red-50 p-2.5 rounded-xl border border-red-200">
+            Semua skor, bintang, item toko, dan progres lapak akan dihapus bersih, lalu kamu akan dialihkan ke form isi nama awal.
+          </p>
         </div>
       </InfoModalCard>
 
