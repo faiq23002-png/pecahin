@@ -1,0 +1,6 @@
+{
+  "appId": "com.pecahin.app",
+  "appName": "PECAH-IN",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

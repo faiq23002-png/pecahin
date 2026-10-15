@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+/* ===== Token warna PECAH-IN (sinkron dengan DESIGN-PECAH-IN.md §2.1) ===== */
+@theme {
+  --font-display: "Baloo 2", "Nunito", system-ui, sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-500: #14b8a6;
+  --color-teal-700: #0f766e;
+
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
+  --color-orange-700: #c2410c;
+
+  --color-amber-400: #fbbf24;
+
+  --color-green-50: #f0fdf4;
+  --color-green-500: #22c55e;
+  --color-green-700: #15803d;
+
+  --color-red-50: #fef2f2;
+  --color-red-500: #ef4444;
+  --color-red-700: #b91c1c;
+
+  --color-krim: #fff8f0;
+  --color-ink: #1e293b;
+  --color-muted: #64748b;
+
+  /* ===== Animasi ===== */
+  --animate-pop: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-wiggle: wiggle 0.6s ease-in-out;
+  --animate-shake: shake 0.45s ease-in-out;
+  --animate-float: float 3.2s ease-in-out infinite;
+  --animate-star-fly: star-fly 0.9s ease-in forwards;
+  --animate-confetti: confetti 2.4s ease-in forwards;
+
+  @keyframes pop {
+    0% { transform: scale(0.6); opacity: 0.4; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg) scale(1.06); }
+    75% { transform: rotate(8deg) scale(1.06); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes star-fly {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(40px, -120px) scale(0.4); opacity: 0; }
+  }
+  @keyframes confetti {
+    0% { transform: translateY(-10%) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-krim);
+    color: var(--color-ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Fokus keyboard yang jelas (aksesibilitas) */
+  :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid #0f766e;
+    outline-offset: 2px;
+  }
+
+  /* Hormati preferensi pengurangan gerak */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ===== Market Booth & Supermarket Header Custom Utilities ===== */
+.bg-market-awning-red {
+  background: repeating-linear-gradient(
+    135deg,
+    #dc2626 0px,
+    #dc2626 22px,
+    #fff8f0 22px,
+    #fff8f0 44px
+  );
+}
+
+.bg-market-awning-teal {
+  background: repeating-linear-gradient(
+    135deg,
+    #0f766e 0px,
+    #0f766e 22px,
+    #fef08a 22px,
+    #fef08a 44px
+  );
+}
+
+.bg-market-awning-orange {
+  background: repeating-linear-gradient(
+    135deg,
+    #ea580c 0px,
+    #ea580c 22px,
+    #fff8f0 22px,
+    #fff8f0 44px
+  );
+}
+
+.bg-wood-sign {
+  background: linear-gradient(180deg, #92400e 0%, #78350f 60%, #451a03 100%);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.35);
+  border: 2px solid #f59e0b;
+}
+
+.bg-wood-sign-light {
+  background: linear-gradient(180deg, #d97706 0%, #b45309 60%, #78350f 100%);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 4px 10px rgba(0, 0, 0, 0.25);
+  border: 2px solid #fef08a;
+}
+
+.bg-chalkboard {
+  background: #0f172a;
+  border: 2px dashed #94a3b8;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.festoon-bulb {
+  animation: bulbGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes bulbGlow {
+  0% {
+    box-shadow: 0 0 6px #fde047, 0 0 12px #f59e0b;
+    opacity: 0.85;
+  }
+  100% {
+    box-shadow: 0 0 12px #fef08a, 0 0 24px #eab308;
+    opacity: 1;
+  }
+}
+
+/* Woven Bamboo Basket Pattern for Market Shopping Basket Cards */
+.bg-basket-woven {
+  background-color: #d97706;
+  background-image: repeating-linear-gradient(
+      45deg,
+      #b45309 0,
+      #b45309 8px,
+      transparent 0,
+      transparent 16px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      #92400e 0,
+      #92400e 8px,
+      transparent 0,
+      transparent 16px
+    );
+}
+
+.bg-basket-card {
+  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+  border: 3px solid #b45309;
+  box-shadow: 0 8px 20px rgba(180, 83, 9, 0.2);
+}
+
+/* Papan kayu flat dengan serat halus (dipakai papan nama, peti, konter) */
+.wood-plank {
+  background-color: #d97706;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(120, 53, 15, 0.18) 0 1px, transparent 1px 7px),
+    linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* Bentuk label harga: ujung kiri lancip + lubang tali */
+.price-tag-wrap {
+  display: inline-flex;
+  filter: drop-shadow(1.5px 0 0 #1e293b) drop-shadow(-1.5px 0 0 #1e293b) drop-shadow(0 1.5px 0 #1e293b)
+    drop-shadow(0 -1.5px 0 #1e293b);
+}
+.price-tag {
+  position: relative;
+  border-radius: 0 6px 6px 0;
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%);
+}
+.price-tag::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 9999px;
+  background: #1e293b;
+}
+
+
+
