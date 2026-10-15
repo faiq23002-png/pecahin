@@ -44,6 +44,8 @@ export function Fraction3DSlice({
   const cfg = KIND_3D[kind];
   const containerRef = useRef<HTMLDivElement>(null);
   const [cutFx, setCutFx] = useState(false);
+  const [knifeY, setKnifeY] = useState<number | null>(null);
+  const doCutRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     const container = containerRef.current;
@@ -184,26 +186,56 @@ export function Fraction3DSlice({
       sliceGroups.push(group);
     }
 
-    // ===== Interaksi putar (drag horizontal) =====
+    // ===== Interaksi: putar (drag horizontal) + potong (swipe vertikal) =====
     let dragging = false;
-    let prevX = 0;
+    let startX = 0;
+    let startY = 0;
+    let lastX = 0;
+    let mode: "idle" | "rotate" | "cut" = "idle";
     let autoRotate = true;
     let autoTimer: number | undefined;
+    let separateUntil = 0;
+
+    doCutRef.current = () => {
+      separateUntil = performance.now() + 550;
+      setCutFx(true);
+      window.setTimeout(() => setCutFx(false), 420);
+      if (onSliceCut) {
+        sfx("whoosh");
+        onSliceCut();
+      }
+    };
 
     const onDown = (e: PointerEvent) => {
       dragging = true;
-      prevX = e.clientX;
+      startX = e.clientX;
+      startY = e.clientY;
+      lastX = e.clientX;
+      mode = "idle";
       autoRotate = false;
       if (autoTimer) window.clearTimeout(autoTimer);
     };
     const onMove = (e: PointerEvent) => {
       if (!dragging) return;
-      const dx = e.clientX - prevX;
-      slicesGroup.rotation.y += dx * 0.012;
-      prevX = e.clientX;
+      if (mode === "idle") {
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 14) mode = "cut";
+        else if (Math.abs(dx) > 10) mode = "rotate";
+      }
+      if (mode === "rotate") {
+        slicesGroup.rotation.y += (e.clientX - lastX) * 0.012;
+        lastX = e.clientX;
+      } else if (mode === "cut") {
+        const rect = container.getBoundingClientRect();
+        setKnifeY(e.clientY - rect.top);
+      }
     };
     const onUp = () => {
+      if (mode === "cut") doCutRef.current();
       dragging = false;
+      mode = "idle";
+      setKnifeY(null);
       autoTimer = window.setTimeout(() => {
         autoRotate = true;
       }, 3000);
@@ -221,6 +253,13 @@ export function Fraction3DSlice({
     const animate = () => {
       raf = requestAnimationFrame(animate);
       if (autoRotate) slicesGroup.rotation.y += 0.005;
+      const now = performance.now();
+      if (now < separateUntil) {
+        const t = (separateUntil - now) / 550;
+        slicesGroup.scale.setScalar(1 + Math.sin(t * Math.PI) * 0.22);
+      } else {
+        slicesGroup.scale.setScalar(1);
+      }
       renderer.render(scene, camera);
     };
     animate();
@@ -243,14 +282,6 @@ export function Fraction3DSlice({
     };
   }, [n, k]);
 
-  const potong = () => {
-    if (!onSliceCut) return;
-    setCutFx(true);
-    sfx("whoosh");
-    onSliceCut();
-    window.setTimeout(() => setCutFx(false), 420);
-  };
-
   return (
     <div className={`relative flex flex-col items-center select-none ${className}`}>
       <div
@@ -258,9 +289,17 @@ export function Fraction3DSlice({
         className="w-full h-56 cursor-grab active:cursor-grabbing rounded-2xl overflow-hidden relative touch-none"
       />
 
+      {/* Pisau mengikuti swipe */}
+      {knifeY !== null && (
+        <div className="pointer-events-none absolute inset-x-0 z-10" style={{ top: knifeY }}>
+          <div className="h-[3px] bg-gradient-to-r from-transparent via-amber-100 to-transparent shadow-[0_0_14px_#fef08a]" />
+          <span className="absolute -top-3 right-4 text-2xl drop-shadow-[0_0_10px_#fef08a]">🔪</span>
+        </div>
+      )}
+
       {/* Kilat pisau saat memotong */}
       {cutFx && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
           <span className="animate-pop text-5xl drop-shadow-[0_0_12px_#fef08a]">🔪</span>
         </div>
       )}
@@ -269,14 +308,14 @@ export function Fraction3DSlice({
         {allowSwipeCut && onSliceCut && (
           <button
             type="button"
-            onClick={potong}
+            onClick={() => doCutRef.current()}
             className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-4 py-1.5 font-display text-xs font-extrabold text-white shadow-md transition active:scale-95"
           >
-            🔪 Potong Semangka
+            🔪 Potong
           </button>
         )}
         <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/60 px-3 py-1 text-[11px] font-bold text-amber-200 border border-amber-300/30">
-          🔄 Geser untuk memutar
+          {onSliceCut ? "🔪 Swipe bawah = potong · 🔄 geser = putar" : "🔄 Geser untuk memutar"}
         </span>
       </div>
     </div>

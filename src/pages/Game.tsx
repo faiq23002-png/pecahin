@@ -2,7 +2,7 @@
  * Game.tsx — Halaman Game & Lapak Jualan Pasar PECAH-IN.
  * 10 Soal per sesi dengan visual dominan, tanpa soal kembar, & mode interaktif (Arsir, Bagi Rata, Banding, Cocokkan/Tarik Garis, Susun Puzzle, Jumlah).
  */
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "@/lib/router-context";
 import { useApp } from "@/lib/profil-context";
 import { GAMES } from "@/lib/content";
@@ -10,6 +10,7 @@ import { semuaSelesai } from "@/lib/progress";
 import { shuffle } from "@/lib/util";
 import { sfx } from "@/lib/audio";
 import { FractionShape, ArsirShape, BagiVisual, type ObjKind } from "@/components/FractionShape";
+import { Fraction3DSlice } from "@/components/Fraction3DSlice";
 import { Mascot } from "@/components/Mascot";
 import { PrimaryButton, ProgressBar } from "@/components/ui";
 import { CelebrationOverlay } from "@/components/CelebrationOverlay";
@@ -80,6 +81,34 @@ type Tugas =
       a: Frac;
       c: Frac;
       opsi: { n: number; k: number; label: string }[];
+      benarIdx: number;
+      prompt: string;
+      customerSpeech: string;
+    }
+  | {
+      id: string;
+      mode: "potong";
+      kind: ObjKind;
+      n: number;
+      k: number;
+      prompt: string;
+      customerSpeech: string;
+    }
+  | {
+      id: string;
+      mode: "piring";
+      kind: ObjKind;
+      a: Frac;
+      c: Frac;
+      prompt: string;
+      customerSpeech: string;
+    }
+  | {
+      id: string;
+      mode: "timpa";
+      kind: ObjKind;
+      target: Frac;
+      opsi: Frac[];
       benarIdx: number;
       prompt: string;
       customerSpeech: string;
@@ -268,6 +297,64 @@ function genJumlah(usedKeys: Set<string>): Tugas | null {
   };
 }
 
+function genPotong(usedKeys: Set<string>): Tugas | null {
+  const nOptions = [4, 6, 8];
+  const n = nOptions[Math.floor(Math.random() * nOptions.length)];
+  const k = 1 + Math.floor(Math.random() * (n - 1));
+  const kind = randomBuah();
+  const key = `potong-${kind}-${n}-${k}`;
+  if (usedKeys.has(key)) return null;
+  usedKeys.add(key);
+  return {
+    id: key,
+    mode: "potong",
+    kind,
+    n,
+    k,
+    prompt: `Geser pisau 🔪 untuk mengambil ${k} dari ${n} potong!`,
+    customerSpeech: `Tolong ambilkan saya ${k}/${n} potong, pakai pisau ya! 🔪`,
+  };
+}
+
+function genPiring(usedKeys: Set<string>): Tugas | null {
+  const den = [4, 5, 6, 8][Math.floor(Math.random() * 4)];
+  const a = 1 + Math.floor(Math.random() * Math.floor((den - 1) / 2));
+  let c = 1 + Math.floor(Math.random() * Math.floor((den - 1) / 2));
+  if (a + c >= den) c = Math.max(1, den - 1 - a);
+  const kind = randomBuah();
+  const key = `piring-${kind}-${a}/${den}+${c}/${den}`;
+  if (usedKeys.has(key)) return null;
+  usedKeys.add(key);
+  return {
+    id: key,
+    mode: "piring",
+    kind,
+    a: [a, den],
+    c: [c, den],
+    prompt: "Seret kedua piring makanan ke piring saji untuk digabung!",
+    customerSpeech: `Gabungkan ${a}/${den} dan ${c}/${den} ke piring saji ya!`,
+  };
+}
+
+function genTimpa(usedKeys: Set<string>): Tugas | null {
+  const kind = randomBuah();
+  const opsi = shuffle<Frac>([[4, 2], [3, 1], [3, 2]]);
+  const benarIdx = opsi.findIndex(([n, k]) => n === 4 && k === 2);
+  const key = `timpa-${kind}-${opsi.map((f) => f.join("/")).join("-")}`;
+  if (usedKeys.has(key)) return null;
+  usedKeys.add(key);
+  return {
+    id: key,
+    mode: "timpa",
+    kind,
+    target: [2, 1],
+    opsi,
+    benarIdx,
+    prompt: "Seret kue yang SENILAI ke atas kue 1/2!",
+    customerSpeech: "Cari kue yang nilainya sama dengan 1/2, lalu timpa ke atasnya!",
+  };
+}
+
 /** Generate 10 soal unik per sesi game (Anti-pengulangan dengan 6 variasi mode interaktif) */
 function generate10UniqueRounds(gameId: string): Tugas[] {
   const usedKeys = new Set<string>();
@@ -280,29 +367,32 @@ function generate10UniqueRounds(gameId: string): Tugas[] {
     () => genCocokkan(usedKeys),
     () => genSusun(usedKeys),
     () => genJumlah(usedKeys),
+    () => genPotong(usedKeys),
+    () => genPiring(usedKeys),
+    () => genTimpa(usedKeys),
   ];
 
   const focusByGame: Record<string, (() => Tugas | null)[]> = {
     g1: [
+      () => genPotong(usedKeys),
       () => genArsir(usedKeys),
       () => genBagiRata(usedKeys),
       () => genCocokkan(usedKeys),
       () => genBanding(usedKeys),
-      () => genSusun(usedKeys),
     ],
     g2: [
+      () => genTimpa(usedKeys),
       () => genBanding(usedKeys),
       () => genSusun(usedKeys),
       () => genCocokkan(usedKeys),
       () => genBagiRata(usedKeys),
-      () => genJumlah(usedKeys),
     ],
     g3: [
+      () => genPiring(usedKeys),
       () => genJumlah(usedKeys),
       () => genSusun(usedKeys),
       () => genCocokkan(usedKeys),
       () => genArsir(usedKeys),
-      () => genBanding(usedKeys),
     ],
     gCampuran: allGenerators,
   };
@@ -426,6 +516,8 @@ interface RoundState {
   shaded: number[];
   matchedPairs: Record<number, number>;
   susunOrder: number[];
+  kTaken: number;
+  dropped: string[];
   checked: boolean;
   isCorrect: boolean;
 }
@@ -455,6 +547,8 @@ function GamePlayEngine({
       shaded: [],
       matchedPairs: {},
       susunOrder: [],
+      kTaken: 0,
+      dropped: [],
       checked: false,
       isCorrect: false,
     }))
@@ -466,6 +560,8 @@ function GamePlayEngine({
     shaded: [],
     matchedPairs: {},
     susunOrder: [],
+    kTaken: 0,
+    dropped: [],
     checked: false,
     isCorrect: false,
   };
@@ -482,12 +578,45 @@ function GamePlayEngine({
   const totalSalah = roundStates.filter((s) => s.checked && !s.isCorrect).length;
   const totalSelesai = roundStates.filter((s) => s.checked).length;
 
+  /* ---------------- Drag & Drop (mode piring & timpa) ---------------- */
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  const startDrag = (id: string, e: React.PointerEvent) => {
+    setDragId(id);
+    setDragPos({ x: e.clientX, y: e.clientY });
+  };
+  const moveDrag = (e: React.PointerEvent) => {
+    if (dragId) setDragPos({ x: e.clientX, y: e.clientY });
+  };
+  const endDrag = () => {
+    if (!dragId) return;
+    const zone = dropRef.current;
+    if (zone) {
+      const r = zone.getBoundingClientRect();
+      if (dragPos.x >= r.left && dragPos.x <= r.right && dragPos.y >= r.top && dragPos.y <= r.bottom) {
+        if (!currentRoundState.dropped.includes(dragId)) {
+          updateCurrentRound({ dropped: [...currentRoundState.dropped, dragId] });
+          sfx("pop");
+        }
+      }
+    }
+    setDragId(null);
+  };
+
   /* ---------------- Periksa Jawaban ---------------- */
   const periksa = () => {
     let benar = false;
 
     if (tugas.mode === "arsir") {
       benar = currentRoundState.shaded.length === tugas.k;
+    } else if (tugas.mode === "potong") {
+      benar = currentRoundState.kTaken === tugas.k;
+    } else if (tugas.mode === "piring") {
+      benar = currentRoundState.dropped.length >= 2;
+    } else if (tugas.mode === "timpa") {
+      benar = currentRoundState.dropped.length === 1 && Number(currentRoundState.dropped[0]) === tugas.benarIdx;
     } else if (tugas.mode === "bagiRata" || tugas.mode === "banding" || tugas.mode === "jumlah") {
       benar = currentRoundState.jawaban === tugas.benarIdx;
     } else if (tugas.mode === "cocokkan") {
@@ -1008,7 +1137,133 @@ function GamePlayEngine({
               </div>
             </div>
           )}
+
+          {/* ================= MODE 7: POTONG (3D SWIPE PISAU) ================= */}
+          {tugas.mode === "potong" && (
+            <div className="flex flex-col items-center">
+              <div className="w-full">
+                <Fraction3DSlice
+                  kind={tugas.kind}
+                  n={tugas.n}
+                  k={currentRoundState.kTaken}
+                  onSliceCut={() => {
+                    if (currentRoundState.checked) return;
+                    updateCurrentRound({ kTaken: Math.min(currentRoundState.kTaken + 1, tugas.n) });
+                  }}
+                  className="w-full"
+                />
+              </div>
+              <div className="mt-1 text-center font-display font-extrabold text-sm text-slate-800">
+                Terambil: <span className="text-base text-orange-600">{currentRoundState.kTaken}</span> dari {tugas.n} bagian
+              </div>
+              {currentRoundState.checked && (
+                <div className={`mt-2 w-full rounded-xl border p-2 text-center font-display text-sm font-black ${currentRoundState.isCorrect ? "border-green-300 bg-green-50 text-green-700" : "border-red-300 bg-red-50 text-red-700"}`}>
+                  {currentRoundState.isCorrect ? "✓ Pas! Potongan sesuai pesanan!" : `✗ Seharusnya ${tugas.k} dari ${tugas.n} bagian.`}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ================= MODE 8: PIRING (DRAG GABUNG) ================= */}
+          {tugas.mode === "piring" && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-center gap-4">
+                {[
+                  { id: "A", f: tugas.a },
+                  { id: "B", f: tugas.c },
+                ].map((src) => {
+                  const dropped = currentRoundState.dropped.includes(src.id);
+                  return (
+                    <button
+                      key={src.id}
+                      type="button"
+                      onPointerDown={(e) => {
+                        if (dropped || currentRoundState.checked) return;
+                        e.currentTarget.setPointerCapture(e.pointerId);
+                        startDrag(src.id, e);
+                      }}
+                      onPointerMove={moveDrag}
+                      onPointerUp={endDrag}
+                      className={`flex cursor-grab flex-col items-center rounded-2xl border-2 p-2 transition ${dropped ? "border-slate-200 bg-slate-100 opacity-40" : "border-slate-200 bg-white active:scale-95"}`}
+                    >
+                      <div className="h-20 w-20"><FractionShape kind={tugas.kind} n={src.f[1]} k={src.f[0]} /></div>
+                      <span className="mt-1 font-display text-sm font-black text-slate-700">{src.f[0]}/{src.f[1]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div ref={dropRef} className="mx-auto flex min-h-28 w-40 flex-col items-center justify-center rounded-full border-4 border-dashed border-amber-400 bg-amber-50 p-3">
+                {currentRoundState.dropped.length === 2 ? (
+                  <>
+                    <div className="h-20 w-20"><FractionShape kind={tugas.kind} n={tugas.a[1]} k={tugas.a[0] + tugas.c[0]} /></div>
+                    <span className="mt-1 font-display text-base font-black text-orange-600">{(tugas.a[0] + tugas.c[0])}/{tugas.a[1]}</span>
+                  </>
+                ) : (
+                  <span className="text-xs font-black text-amber-700">🫓 Piring Saji — seret kue ke sini</span>
+                )}
+              </div>
+
+              {currentRoundState.checked && (
+                <div className={`w-full rounded-xl border p-2 text-center font-display text-sm font-black ${currentRoundState.isCorrect ? "border-green-300 bg-green-50 text-green-700" : "border-red-300 bg-red-50 text-red-700"}`}>
+                  {currentRoundState.isCorrect ? "✓ Berhasil digabung!" : "✗ Gabungkan kedua piring dulu!"}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ================= MODE 9: TIMPA (DRAG SENILAI) ================= */}
+          {tugas.mode === "timpa" && (
+            <div className="space-y-3">
+              <div ref={dropRef} className="mx-auto flex h-28 w-32 flex-col items-center justify-center rounded-2xl border-4 border-dashed border-teal-400 bg-teal-50">
+                <div className="h-16 w-16"><FractionShape kind={tugas.kind} n={tugas.target[1]} k={tugas.target[0]} /></div>
+                <span className="mt-1 font-display text-sm font-black text-teal-700">{tugas.target[0]}/{tugas.target[1]}</span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                {tugas.opsi.map((f, i) => {
+                  const dropped = currentRoundState.dropped.includes(String(i));
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onPointerDown={(e) => {
+                        if (dropped || currentRoundState.checked) return;
+                        e.currentTarget.setPointerCapture(e.pointerId);
+                        startDrag(String(i), e);
+                      }}
+                      onPointerMove={moveDrag}
+                      onPointerUp={endDrag}
+                      className={`flex cursor-grab flex-col items-center rounded-2xl border-2 p-2 transition ${dropped ? "border-slate-200 bg-slate-100 opacity-40" : "border-slate-200 bg-white active:scale-95"}`}
+                    >
+                      <div className="h-16 w-16"><FractionShape kind={tugas.kind} n={f[1]} k={f[0]} /></div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {currentRoundState.checked && (
+                <div className={`w-full rounded-xl border p-2 text-center font-display text-sm font-black ${currentRoundState.isCorrect ? "border-green-300 bg-green-50 text-green-700" : "border-red-300 bg-red-50 text-red-700"}`}>
+                  {currentRoundState.isCorrect ? "✓ Benar! Nilainya sama." : "✗ Coba seret kue yang senilai."}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+
+        {/* Overlay objek yang sedang di-drag */}
+        {dragId !== null && (
+          <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2" style={{ left: dragPos.x, top: dragPos.y }}>
+            <div className="h-16 w-16 rounded-2xl bg-white p-1 shadow-2xl ring-2 ring-amber-400">
+              {tugas.mode === "piring" && (
+                dragId === "A"
+                  ? <FractionShape kind={tugas.kind} n={tugas.a[1]} k={tugas.a[0]} />
+                  : <FractionShape kind={tugas.kind} n={tugas.c[1]} k={tugas.c[0]} />
+              )}
+              {tugas.mode === "timpa" && <FractionShape kind={tugas.kind} n={tugas.opsi[Number(dragId)][1]} k={tugas.opsi[Number(dragId)][0]} />}
+            </div>
+          </div>
+        )}
 
         {/* Tombol Periksa / Ronde Berikutnya */}
         <div>
@@ -1018,6 +1273,10 @@ function GamePlayEngine({
               disabled={
                 tugas.mode === "arsir"
                   ? currentRoundState.shaded.length === 0
+                  : tugas.mode === "potong"
+                  ? currentRoundState.kTaken === 0
+                  : tugas.mode === "piring" || tugas.mode === "timpa"
+                  ? currentRoundState.dropped.length === 0
                   : tugas.mode === "cocokkan"
                   ? Object.keys(currentRoundState.matchedPairs).length < 3
                   : tugas.mode === "susun"

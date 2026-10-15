@@ -66,3 +66,25 @@ export function SectionTitle({ children, action }: { children: React.ReactNode; 
     </div>
   );
 }
+
+/** Pecahan bersusun (pembilang di atas, penyebut di bawah, garis tengah). */
+export function StackedFraction({
+  num,
+  den,
+  className = "",
+  size = "md",
+}: {
+  num: React.ReactNode;
+  den: React.ReactNode;
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}) {
+  const sz = size === "lg" ? "text-2xl" : size === "sm" ? "text-[13px]" : "text-base";
+  return (
+    <span className={`inline-flex flex-col items-center align-middle leading-none ${sz} ${className}`}>
+      <span className="font-display font-extrabold tabular-nums">{num}</span>
+      <span className="my-1 h-[2px] w-5 rounded-full bg-current" />
+      <span className="font-display font-extrabold tabular-nums">{den}</span>
+    </span>
+  );
+}

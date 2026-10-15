@@ -153,12 +153,14 @@ export default function Home() {
 
       {/* ================= GERBANG PASAR ATAP & JUDUL (FIXED TOP) ================= */}
       <div className="sticky top-0 z-30 w-full select-none">
-        <Awning tone="teal" height={30} stripe={22} light="#fef08a" />
-        <div className="-mt-1 flex justify-center">
-          <HangingSign rope={12}>
-            <span className="font-display text-sm font-extrabold uppercase tracking-[0.18em] text-white [text-shadow:0_1px_0_rgba(0,0,0,.4)]">
-              Pasar Pecah-In
-            </span>
+        <Awning tone="teal" height={32} stripe={22} light="#fef08a" />
+        <div className="-mt-1.5 flex justify-center pb-1">
+          <HangingSign rope={10} className="px-3 py-0.5">
+            <img
+              src="/judul-pecahin.png"
+              alt="PECAH-IN"
+              className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+            />
           </HangingSign>
         </div>
       </div>

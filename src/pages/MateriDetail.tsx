@@ -13,7 +13,7 @@ import { TahapTabs } from "@/components/TahapTabs";
 import { FractionShape, ArsirShape, BagiVisual, type ObjKind } from "@/components/FractionShape";
 import { NumberLine } from "@/components/NumberLine";
 import { AnswerPill, type PillState } from "@/components/AnswerPill";
-import { PrimaryButton, Card, ProgressBar } from "@/components/ui";
+import { PrimaryButton, Card, ProgressBar, StackedFraction } from "@/components/ui";
 import { CelebrationOverlay } from "@/components/CelebrationOverlay";
 import { IconBack, IconSound, IconLock } from "@/components/icons";
 import { StallCard } from "@/components/MarketBoothHeader";
@@ -496,7 +496,9 @@ function BelajarM3({ pel }: { pel: any }) {
         <p className="text-sm font-medium text-ink mb-3">{pel.belajar[0].teks}</p>
 
         <div className="rounded-2xl bg-teal-50/80 p-3 border border-teal-200">
-          <div className="text-xs font-bold text-teal-800 mb-2 text-center">Simulasi Penjumlahan Potongan Kue:</div>
+          <div className="text-xs font-bold text-teal-800 mb-2 text-center">
+            Ibu sudah punya <StackedFraction num={1} den={6} size="sm" className="text-teal-700" /> kue. Pilih berapa bagian lagi yang ditambahkan:
+          </div>
 
           <div className="flex justify-center gap-2 mb-3">
             {[1, 2, 3, 4].map((v) => (
@@ -504,20 +506,24 @@ function BelajarM3({ pel }: { pel: any }) {
                 key={v}
                 type="button"
                 onClick={() => { setAdded(v); sfx("pop"); }}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition border ${added === v
+                className={`flex flex-col items-center px-3 py-1.5 rounded-xl text-xs font-bold transition border ${added === v
                   ? "bg-teal-600 text-white border-teal-700 shadow"
                   : "bg-white text-slate-700 border-slate-200"
                   }`}
               >
-                + {v}/6 Potong
+                <StackedFraction num={v} den={6} size="sm" />
               </button>
             ))}
           </div>
 
           <div className="bg-white p-3 rounded-2xl border border-teal-200 flex flex-col items-center">
             <Fraction3DSlice kind="kue-batang" n={6} k={1 + added} allowSwipeCut={false} className="w-full" />
-            <div className="mt-2 font-display text-xl font-extrabold text-teal-700">
-              1/6 + {added}/6 = <span className="text-amber-600">{1 + added}/6</span>
+            <div className="mt-2 flex items-center justify-center gap-2 text-teal-700">
+              <StackedFraction num={1} den={6} size="lg" />
+              <span className="text-2xl font-black">+</span>
+              <StackedFraction num={added} den={6} size="lg" />
+              <span className="text-2xl font-black">=</span>
+              <span className="text-amber-600"><StackedFraction num={1 + added} den={6} size="lg" /></span>
             </div>
             <div className="text-xs font-bold text-slate-600 mt-1 text-center">
               Pembilang dijumlah: (1 + {added} = {1 + added}), Penyebut TETAP (6)
@@ -627,6 +633,9 @@ function Coba({ materiId, onLanjut }: { materiId: string; onLanjut: () => void }
   const [n, setN] = useState(4);
   const [k, setK] = useState(1);
 
+  // Materi 3 (Penjumlahan) pakai konsep "Gabungkan Potongan"
+  if (materiId === "m3") return <CobaM3 onLanjut={onLanjut} />;
+
   return (
     <div className="flex flex-col gap-4">
       <StallCard icon="🎮" title={pel.coba[0].judul} tone="teal">
@@ -693,19 +702,139 @@ function Coba({ materiId, onLanjut }: { materiId: string; onLanjut: () => void }
           <p className="mt-2 text-center text-xs font-semibold text-muted">Nilai sama, tulisannya beda!</p>
         </Card>
       )}
-      {materiId === "m3" && (
-        <Card>
-          <div className="font-display text-sm font-bold text-teal-700">Gabungkan Potongan</div>
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <div className="h-20 w-20"><FractionShape kind={kind} n={6} k={2} /></div>
-            <span className="font-display text-xl font-extrabold text-ink">+</span>
-            <div className="h-20 w-20"><FractionShape kind={kind} n={6} k={1} /></div>
-            <span className="font-display text-xl font-extrabold text-ink">=</span>
-            <div className="h-20 w-20"><FractionShape kind={kind} n={6} k={3} /></div>
+
+      <button
+        type="button"
+        onClick={onLanjut}
+        className="w-full wood-plank border-2 border-ink rounded-2xl py-3.5 px-6 font-display text-base font-extrabold text-white shadow-[0_4px_0_#1e293b] active:translate-y-[2px] active:shadow-[0_2px_0_#1e293b] transition [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]"
+      >
+        Selesai, Lanjut ke Ayo Latihan
+      </button>
+    </div>
+  );
+}
+
+function CobaM3({ onLanjut }: { onLanjut: () => void }) {
+  const pel = PELAJARAN.m3;
+  const [a, setA] = useState(1);
+  const [b, setB] = useState(2);
+  const [jawaban, setJawaban] = useState<number | null>(null);
+  const [dicek, setDicek] = useState(false);
+  const total = a + b;
+
+  const opsi = useMemo(
+    () =>
+      shuffle([
+        { num: total, den: 6, benar: true },
+        { num: total, den: 12, benar: false },
+        { num: a, den: 6, benar: false },
+        { num: b, den: 6, benar: false },
+      ]),
+    [a, b],
+  );
+
+  const pilih = (v: number, isA: boolean) => {
+    if (isA) setA(v);
+    else setB(v);
+    setJawaban(null);
+    setDicek(false);
+  };
+
+  const periksa = () => {
+    if (jawaban === null) return;
+    setDicek(true);
+    sfx(opsi[jawaban].benar ? "success" : "wrong");
+  };
+
+  const optCls = (i: number) => {
+    if (!dicek) return jawaban === i ? "border-teal-700 bg-teal-50 ring-2 ring-teal-500" : "border-slate-200 bg-white";
+    if (opsi[i].benar) return "border-green-600 bg-green-50";
+    if (jawaban === i) return "border-red-600 bg-red-50";
+    return "border-slate-200 bg-white opacity-40";
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <StallCard icon="🎮" title={pel.coba[0].judul} tone="teal">
+        <p className="text-sm font-medium text-ink">{pel.coba[0].teks}</p>
+      </StallCard>
+
+      <StallCard icon="🍰" title="Gabungkan Potongan" tone="orange">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-center">
+            <div className="text-xs font-bold text-slate-600 mb-1">Kue pertama</div>
+            <div className="mb-2 flex justify-center gap-1">
+              {[1, 2, 3, 4].map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => pilih(v, true)}
+                  className={`h-8 w-8 rounded-lg text-xs font-bold ${a === v ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-700"}`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+            <div className="mx-auto h-20 w-20"><FractionShape kind="kue-batang" n={6} k={a} /></div>
+            <div className="mt-1 text-xs font-bold text-teal-700"><StackedFraction num={a} den={6} size="sm" /></div>
           </div>
-          <p className="mt-2 text-center text-sm font-bold text-ink">2/6 + 1/6 = 3/6 (penyebut tetap)</p>
-        </Card>
-      )}
+
+          <div className="text-center">
+            <div className="text-xs font-bold text-slate-600 mb-1">Kue kedua</div>
+            <div className="mb-2 flex justify-center gap-1">
+              {[1, 2, 3, 4].map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => pilih(v, false)}
+                  className={`h-8 w-8 rounded-lg text-xs font-bold ${b === v ? "bg-orange-500 text-white" : "bg-slate-100 text-slate-700"}`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+            <div className="mx-auto h-20 w-20"><FractionShape kind="kue-batang" n={6} k={b} /></div>
+            <div className="mt-1 text-xs font-bold text-orange-600"><StackedFraction num={b} den={6} size="sm" /></div>
+          </div>
+        </div>
+
+        {/* rumus gabung */}
+        <div className="mt-3 flex items-center justify-center gap-2 text-teal-700">
+          <StackedFraction num={a} den={6} size="lg" />
+          <span className="text-2xl font-black">+</span>
+          <StackedFraction num={b} den={6} size="lg" />
+          <span className="text-2xl font-black">=</span>
+          <span className="font-display text-2xl font-black text-amber-600">?</span>
+        </div>
+
+        <div className="mt-3 text-center text-xs font-bold text-slate-600">Pilih hasil gabungannya:</div>
+        <div className="mt-2 grid grid-cols-4 gap-2">
+          {opsi.map((o, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => {
+                setJawaban(i);
+                setDicek(false);
+              }}
+              disabled={dicek}
+              className={`flex flex-col items-center rounded-xl border-2 p-2 transition ${optCls(i)}`}
+            >
+              <StackedFraction num={o.num} den={o.den} size="sm" />
+            </button>
+          ))}
+        </div>
+
+        {!dicek ? (
+          <PrimaryButton onClick={periksa} disabled={jawaban === null} color="teal" className="mt-3 w-full">
+            Periksa
+          </PrimaryButton>
+        ) : (
+          <div className={`mt-3 w-full rounded-xl border p-2 text-center font-display text-sm font-black ${opsi[jawaban!].benar ? "border-green-300 bg-green-50 text-green-700" : "border-red-300 bg-red-50 text-red-700"}`}>
+            {opsi[jawaban!].benar ? "✓ Benar! Penyebut tetap, pembilang dijumlah." : "✗ Coba lagi: jumlahkan pembilang, penyebut tetap 6."}
+          </div>
+        )}
+      </StallCard>
 
       <button
         type="button"
