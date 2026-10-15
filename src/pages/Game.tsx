@@ -12,7 +12,7 @@ import { sfx } from "@/lib/audio";
 import { FractionShape, ArsirShape, BagiVisual, type ObjKind } from "@/components/FractionShape";
 import { Fraction3DSlice } from "@/components/Fraction3DSlice";
 import { Mascot } from "@/components/Mascot";
-import { PrimaryButton, ProgressBar } from "@/components/ui";
+import { PrimaryButton, ProgressBar, StackedFraction } from "@/components/ui";
 import { CelebrationOverlay } from "@/components/CelebrationOverlay";
 import { PageBoothHeader, AwningScallops } from "@/components/MarketBoothHeader";
 import { IconLock, IconBack } from "@/components/icons";
@@ -338,8 +338,9 @@ function genPiring(usedKeys: Set<string>): Tugas | null {
 
 function genTimpa(usedKeys: Set<string>): Tugas | null {
   const kind = randomBuah();
-  const opsi = shuffle<Frac>([[4, 2], [3, 1], [3, 2]]);
-  const benarIdx = opsi.findIndex(([n, k]) => n === 4 && k === 2);
+  // [pembilang, penyebut]: 2/4 (senilai 1/2), 1/3, 2/3
+  const opsi = shuffle<Frac>([[2, 4], [1, 3], [2, 3]]);
+  const benarIdx = opsi.findIndex(([num, den]) => num === 2 && den === 4);
   const key = `timpa-${kind}-${opsi.map((f) => f.join("/")).join("-")}`;
   if (usedKeys.has(key)) return null;
   usedKeys.add(key);
@@ -347,7 +348,7 @@ function genTimpa(usedKeys: Set<string>): Tugas | null {
     id: key,
     mode: "timpa",
     kind,
-    target: [2, 1],
+    target: [1, 2], // 1/2
     opsi,
     benarIdx,
     prompt: "Seret kue yang SENILAI ke atas kue 1/2!",
@@ -373,26 +374,23 @@ function generate10UniqueRounds(gameId: string): Tugas[] {
   ];
 
   const focusByGame: Record<string, (() => Tugas | null)[]> = {
+    // Lapak 1 — Kenal Pecahan & Bagi Rata
     g1: [
       () => genPotong(usedKeys),
       () => genArsir(usedKeys),
       () => genBagiRata(usedKeys),
       () => genCocokkan(usedKeys),
-      () => genBanding(usedKeys),
     ],
+    // Lapak 2 — Banding, Urut & Senilai
     g2: [
-      () => genTimpa(usedKeys),
       () => genBanding(usedKeys),
       () => genSusun(usedKeys),
-      () => genCocokkan(usedKeys),
-      () => genBagiRata(usedKeys),
+      () => genTimpa(usedKeys),
     ],
+    // Lapak 3 — Jumlah & Cerita
     g3: [
-      () => genPiring(usedKeys),
       () => genJumlah(usedKeys),
-      () => genSusun(usedKeys),
-      () => genCocokkan(usedKeys),
-      () => genArsir(usedKeys),
+      () => genPiring(usedKeys),
     ],
     gCampuran: allGenerators,
   };
@@ -584,10 +582,12 @@ function GamePlayEngine({
   const dropRef = useRef<HTMLDivElement>(null);
 
   const startDrag = (id: string, e: React.PointerEvent) => {
+    e.preventDefault();
     setDragId(id);
     setDragPos({ x: e.clientX, y: e.clientY });
   };
   const moveDrag = (e: React.PointerEvent) => {
+    e.preventDefault();
     if (dragId) setDragPos({ x: e.clientX, y: e.clientY });
   };
   const endDrag = () => {
@@ -879,7 +879,7 @@ function GamePlayEngine({
                   disabled={currentRoundState.checked}
                   className={`relative rounded-2xl border-2 p-2 transition active:scale-95 ${optCls(i, tugas.benarIdx)}`}
                 >
-                  <div className="mx-auto h-24 w-24">
+                  <div className="mx-auto aspect-square w-full">
                     <BagiVisual kind={o.kind} parts={o.parts} equal={o.equal} />
                   </div>
                   {currentRoundState.checked && i === tugas.benarIdx && (
@@ -1184,7 +1184,7 @@ function GamePlayEngine({
                       }}
                       onPointerMove={moveDrag}
                       onPointerUp={endDrag}
-                      className={`flex cursor-grab flex-col items-center rounded-2xl border-2 p-2 transition ${dropped ? "border-slate-200 bg-slate-100 opacity-40" : "border-slate-200 bg-white active:scale-95"}`}
+                      className={`flex cursor-grab touch-none flex-col items-center rounded-2xl border-2 p-2 transition ${dropped ? "border-slate-200 bg-slate-100 opacity-40" : "border-slate-200 bg-white active:scale-95"}`}
                     >
                       <div className="h-20 w-20"><FractionShape kind={tugas.kind} n={src.f[1]} k={src.f[0]} /></div>
                       <span className="mt-1 font-display text-sm font-black text-slate-700">{src.f[0]}/{src.f[1]}</span>
@@ -1217,7 +1217,7 @@ function GamePlayEngine({
             <div className="space-y-3">
               <div ref={dropRef} className="mx-auto flex h-28 w-32 flex-col items-center justify-center rounded-2xl border-4 border-dashed border-teal-400 bg-teal-50">
                 <div className="h-16 w-16"><FractionShape kind={tugas.kind} n={tugas.target[1]} k={tugas.target[0]} /></div>
-                <span className="mt-1 font-display text-sm font-black text-teal-700">{tugas.target[0]}/{tugas.target[1]}</span>
+                <span className="mt-1 text-teal-700"><StackedFraction num={tugas.target[0]} den={tugas.target[1]} size="sm" /></span>
               </div>
 
               <div className="grid grid-cols-3 gap-2">
@@ -1234,9 +1234,10 @@ function GamePlayEngine({
                       }}
                       onPointerMove={moveDrag}
                       onPointerUp={endDrag}
-                      className={`flex cursor-grab flex-col items-center rounded-2xl border-2 p-2 transition ${dropped ? "border-slate-200 bg-slate-100 opacity-40" : "border-slate-200 bg-white active:scale-95"}`}
+                      className={`flex cursor-grab touch-none flex-col items-center rounded-2xl border-2 p-2 transition ${dropped ? "border-slate-200 bg-slate-100 opacity-40" : "border-slate-200 bg-white active:scale-95"}`}
                     >
-                      <div className="h-16 w-16"><FractionShape kind={tugas.kind} n={f[1]} k={f[0]} /></div>
+                      <div className="h-20 w-20"><FractionShape kind={tugas.kind} n={f[1]} k={f[0]} /></div>
+                      <span className="mt-1 text-slate-700"><StackedFraction num={f[0]} den={f[1]} size="sm" /></span>
                     </button>
                   );
                 })}

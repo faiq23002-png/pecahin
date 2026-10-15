@@ -13,7 +13,7 @@ import { TahapTabs } from "@/components/TahapTabs";
 import { FractionShape, ArsirShape, BagiVisual, type ObjKind } from "@/components/FractionShape";
 import { NumberLine } from "@/components/NumberLine";
 import { AnswerPill, type PillState } from "@/components/AnswerPill";
-import { PrimaryButton, Card, ProgressBar, StackedFraction } from "@/components/ui";
+import { PrimaryButton, Card, ProgressBar, StackedFraction, FractionText } from "@/components/ui";
 import { CelebrationOverlay } from "@/components/CelebrationOverlay";
 import { IconBack, IconSound, IconLock } from "@/components/icons";
 import { StallCard } from "@/components/MarketBoothHeader";
@@ -1043,7 +1043,7 @@ function Latihan({ materiId }: { materiId: string }) {
 
       {sudahBenar ? (
         <StallCard icon="✅" title={`Soal ${idx + 1} · Sudah Benar`} tone="teal">
-          <div className="font-display text-base font-bold text-ink">{soal.teks}</div>
+          <div className="font-display text-base font-bold text-ink"><FractionText text={soal.teks} size="md" /></div>
           {isArsir && arsirInfo ? (
             <div className="mx-auto mt-3 h-36 w-36">
               <FractionShape kind={arsirInfo.kind} n={arsirInfo.n} k={arsirInfo.target} />
@@ -1061,7 +1061,7 @@ function Latihan({ materiId }: { materiId: string }) {
         <>
           <StallCard icon="✏️" title={`Soal ${idx + 1}`} tone="orange">
             <div className="flex items-start justify-between gap-2">
-              <div className="font-display text-lg font-bold text-ink">{soal.teks}</div>
+              <div className="font-display text-lg font-bold text-ink"><FractionText text={soal.teks} size="md" /></div>
               <button
                 type="button"
                 onClick={dengarkan}
@@ -1100,13 +1100,6 @@ function Latihan({ materiId }: { materiId: string }) {
             </StallCard>
           ) : (
             <>
-              {operand && !checked && (
-                <Card>
-                  <div className="text-xs font-bold text-ink">Cek Masuk Akal: geser perkiraan hasilnya</div>
-                  <NumberLine operands={operand} estimate={estimasi} onEstimate={setEstimasi} />
-                </Card>
-              )}
-
               {punyaVisualOpsi ? (
                 <div className="grid grid-cols-3 gap-2">
                   {pilihan.map((p) => {
@@ -1129,7 +1122,7 @@ function Latihan({ materiId }: { materiId: string }) {
                         className={`relative rounded-2xl border-2 p-2 transition active:scale-[0.98] ${cls}`}
                       >
                         {p.visual ? (
-                          <div className="mx-auto h-24 w-24">
+                          <div className="mx-auto aspect-square w-full">
                             <BagiVisual kind={p.visual.kind} parts={p.visual.parts} equal={p.visual.equal} />
                           </div>
                         ) : (

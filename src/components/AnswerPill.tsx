@@ -1,6 +1,7 @@
 /** Opsi jawaban pill (A/B/C/D) dengan state benar/salah pakai tint + ikon (kontras AA). */
 import React from "react";
 import { IconCheck, IconX } from "./icons";
+import { FractionText } from "./ui";
 
 export type PillState = "idle" | "selected" | "correct" | "wrong";
 
@@ -34,7 +35,7 @@ export function AnswerPill({
       disabled={disabled}
       className={`flex w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left text-[15px] font-bold transition active:scale-[0.98] ${cls} ${disabled ? "opacity-90" : ""}`}
     >
-      <span className="flex-1">{label}</span>
+      <span className="flex-1"><FractionText text={label} size="sm" /></span>
       {state === "correct" && <IconCheck size={20} className="shrink-0 text-green-700" />}
       {state === "wrong" && <IconX size={20} className="shrink-0 text-red-700" />}
     </button>

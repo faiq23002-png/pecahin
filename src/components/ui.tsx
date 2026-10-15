@@ -88,3 +88,26 @@ export function StackedFraction({
     </span>
   );
 }
+
+/** Render teks yang mengandung "a/b" menjadi pecahan bersusun. */
+export function FractionText({
+  text,
+  className = "",
+  size = "sm",
+}: {
+  text: string;
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}) {
+  const re = /(\d+)\/(\d+)/g;
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > lastIndex) nodes.push(text.slice(lastIndex, m.index));
+    nodes.push(<StackedFraction key={m.index} num={m[1]} den={m[2]} size={size} />);
+    lastIndex = m.index + m[0].length;
+  }
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
+  return <span className={className}>{nodes}</span>;
+}
