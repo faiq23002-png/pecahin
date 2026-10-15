@@ -580,30 +580,55 @@ function GamePlayEngine({
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
   const dropRef = useRef<HTMLDivElement>(null);
+  const dragStateRef = useRef<{ id: string; x: number; y: number } | null>(null);
 
   const startDrag = (id: string, e: React.PointerEvent) => {
     e.preventDefault();
+    dragStateRef.current = { id, x: e.clientX, y: e.clientY };
     setDragId(id);
     setDragPos({ x: e.clientX, y: e.clientY });
   };
-  const moveDrag = (e: React.PointerEvent) => {
-    e.preventDefault();
-    if (dragId) setDragPos({ x: e.clientX, y: e.clientY });
-  };
-  const endDrag = () => {
+
+  // Listener global (window) agar seret tetap terdeteksi walau jari keluar dari tombol
+  useEffect(() => {
     if (!dragId) return;
-    const zone = dropRef.current;
-    if (zone) {
-      const r = zone.getBoundingClientRect();
-      if (dragPos.x >= r.left && dragPos.x <= r.right && dragPos.y >= r.top && dragPos.y <= r.bottom) {
-        if (!currentRoundState.dropped.includes(dragId)) {
-          updateCurrentRound({ dropped: [...currentRoundState.dropped, dragId] });
-          sfx("pop");
+    const onMove = (e: PointerEvent) => {
+      dragStateRef.current = { id: dragId, x: e.clientX, y: e.clientY };
+      setDragPos({ x: e.clientX, y: e.clientY });
+    };
+    const onUp = (e: PointerEvent) => {
+      const st = dragStateRef.current;
+      if (st) {
+        const zone = dropRef.current;
+        if (zone) {
+          const r = zone.getBoundingClientRect();
+          if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+            let droppedNow = false;
+            setRoundStates((prev) => {
+              const next = [...prev];
+              const cur = next[idx];
+              if (cur && !cur.dropped.includes(st.id)) {
+                next[idx] = { ...cur, dropped: [...cur.dropped, st.id] };
+                droppedNow = true;
+              }
+              return next;
+            });
+            if (droppedNow) sfx("pop");
+          }
         }
       }
-    }
-    setDragId(null);
-  };
+      dragStateRef.current = null;
+      setDragId(null);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+    };
+  }, [dragId, idx]);
 
   /* ---------------- Periksa Jawaban ---------------- */
   const periksa = () => {
@@ -1179,11 +1204,8 @@ function GamePlayEngine({
                       type="button"
                       onPointerDown={(e) => {
                         if (dropped || currentRoundState.checked) return;
-                        e.currentTarget.setPointerCapture(e.pointerId);
                         startDrag(src.id, e);
                       }}
-                      onPointerMove={moveDrag}
-                      onPointerUp={endDrag}
                       className={`flex cursor-grab touch-none flex-col items-center rounded-2xl border-2 p-2 transition ${dropped ? "border-slate-200 bg-slate-100 opacity-40" : "border-slate-200 bg-white active:scale-95"}`}
                     >
                       <div className="h-20 w-20"><FractionShape kind={tugas.kind} n={src.f[1]} k={src.f[0]} /></div>
@@ -1229,11 +1251,8 @@ function GamePlayEngine({
                       type="button"
                       onPointerDown={(e) => {
                         if (dropped || currentRoundState.checked) return;
-                        e.currentTarget.setPointerCapture(e.pointerId);
                         startDrag(String(i), e);
                       }}
-                      onPointerMove={moveDrag}
-                      onPointerUp={endDrag}
                       className={`flex cursor-grab touch-none flex-col items-center rounded-2xl border-2 p-2 transition ${dropped ? "border-slate-200 bg-slate-100 opacity-40" : "border-slate-200 bg-white active:scale-95"}`}
                     >
                       <div className="h-20 w-20"><FractionShape kind={tugas.kind} n={f[1]} k={f[0]} /></div>
