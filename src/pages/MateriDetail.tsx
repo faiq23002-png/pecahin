@@ -423,11 +423,9 @@ function BelajarM2({ pel }: { pel: any }) {
             ))}
           </div>
 
-          <div className="grid grid-cols-2 items-center gap-4 w-full bg-white p-3 rounded-2xl border border-amber-200">
-            <div className="h-28 mx-auto">
-              <FractionShape kind="pizza" n={denom} k={1} />
-            </div>
-            <div className="text-xs font-bold text-slate-700 space-y-1">
+          <div className="w-full bg-white p-3 rounded-2xl border border-amber-200 flex flex-col items-center">
+            <Fraction3DSlice kind="pizza" n={denom} k={1} allowSwipeCut={false} className="w-full" />
+            <div className="mt-2 text-xs font-bold text-slate-700 text-center">
               <div className="text-sm font-extrabold text-amber-700">1/{denom} bagian</div>
               <p>
                 {denom === 8 && "🔴 Dibagi 8 orang → Potongannya KECIL!"}
@@ -517,10 +515,8 @@ function BelajarM3({ pel }: { pel: any }) {
           </div>
 
           <div className="bg-white p-3 rounded-2xl border border-teal-200 flex flex-col items-center">
-            <div className="h-24 w-44">
-              <FractionShape kind="kue-batang" n={6} k={1 + added} />
-            </div>
-            <div className="mt-10 font-display text-xl font-extrabold text-teal-700">
+            <Fraction3DSlice kind="kue-batang" n={6} k={1 + added} allowSwipeCut={false} className="w-full" />
+            <div className="mt-2 font-display text-xl font-extrabold text-teal-700">
               1/6 + {added}/6 = <span className="text-amber-600">{1 + added}/6</span>
             </div>
             <div className="text-xs font-bold text-slate-600 mt-1 text-center">
@@ -669,9 +665,9 @@ function Coba({ materiId, onLanjut }: { materiId: string; onLanjut: () => void }
             </button>
           ))}
         </div>
-        <div className="mt-4 grid grid-cols-2 items-center gap-4">
-          <div className="h-32"><FractionShape kind={kind} n={n} k={k} /></div>
-          <div className="text-center">
+        <div className="mt-4">
+          <Fraction3DSlice kind={kind} n={n} k={k} allowSwipeCut={false} className="w-full" />
+          <div className="mt-1 text-center">
             <div className="font-display text-4xl font-extrabold text-orange-600">{k}/{n}</div>
             <div className="text-xs font-semibold text-muted">bagian terarsir</div>
           </div>
@@ -730,6 +726,15 @@ function parseArsir(jawaban: string, kind?: ObjKind): { kind: ObjKind; n: number
 
 function SoalVisual({ soal }: { soal: Soal }) {
   if (!soal.visual) return null;
+  // Satu objek → tampilkan 3D interaktif; banyak objek (vs/penjumlahan) → 2D biar ringan
+  if (soal.visual.shapes.length === 1) {
+    const s = soal.visual.shapes[0];
+    return (
+      <div className="mt-3 rounded-2xl bg-slate-50 p-2">
+        <Fraction3DSlice kind={s.kind} n={s.n} k={s.k} allowSwipeCut={false} className="w-full" />
+      </div>
+    );
+  }
   return (
     <div className="mt-3 flex flex-wrap items-center justify-center gap-2 rounded-2xl bg-slate-50 p-3">
       {soal.visual.shapes.map((s, i) => (

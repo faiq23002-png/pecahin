@@ -9,22 +9,39 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { sfx } from "@/lib/audio";
+import type { ObjKind } from "@/lib/types";
 
 interface Fraction3DProps {
   n: number; // jumlah total bagian (penyebut)
   k: number; // jumlah bagian yang diarsir / diambil
+  kind?: ObjKind;
   onSliceCut?: () => void;
   className?: string;
   allowSwipeCut?: boolean;
 }
 
+// Warna 3D + topping per jenis objek
+type Topping = "seeds" | "sesame" | "pepperoni" | "sprinkles" | "leaf" | "none";
+const KIND_3D: Record<ObjKind, { flesh: number; active: number; inner: number; outer: number; topping: Topping }> = {
+  semangka: { flesh: 0xe11d48, active: 0xff1744, inner: 0xfef9c3, outer: 0x15803d, topping: "seeds" },
+  jeruk: { flesh: 0xf97316, active: 0xfdba74, inner: 0xffedc5, outer: 0xc2410c, topping: "leaf" },
+  "kue-tart": { flesh: 0xec4899, active: 0xf472b6, inner: 0xfce7f3, outer: 0xa16207, topping: "sprinkles" },
+  pizza: { flesh: 0xfacc15, active: 0xfde047, inner: 0xfef3c7, outer: 0x92400e, topping: "pepperoni" },
+  roti: { flesh: 0xd97706, active: 0xf59e0b, inner: 0xfef3c7, outer: 0xb45309, topping: "sesame" },
+  cokelat: { flesh: 0x92400e, active: 0xa16207, inner: 0xd6d3d1, outer: 0x451a03, topping: "sprinkles" },
+  keju: { flesh: 0xfde047, active: 0xfef08a, inner: 0xfefce8, outer: 0xca8a04, topping: "sesame" },
+  "kue-batang": { flesh: 0xf9a8d4, active: 0xfbcfe8, inner: 0xfce7f3, outer: 0xd97706, topping: "sprinkles" },
+};
+
 export function Fraction3DSlice({
   n = 4,
   k = 1,
+  kind = "semangka",
   onSliceCut,
   className = "",
   allowSwipeCut = true,
 }: Fraction3DProps) {
+  const cfg = KIND_3D[kind];
   const containerRef = useRef<HTMLDivElement>(null);
   const [cutFx, setCutFx] = useState(false);
 
@@ -82,12 +99,20 @@ export function Fraction3DSlice({
     const sliceHeight = 0.6;
     const sliceAngle = (Math.PI * 2) / n;
 
-    const matFlesh = new THREE.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.4 });
-    const matActive = new THREE.MeshStandardMaterial({ color: 0xff1744, roughness: 0.3, emissive: 0x881337, emissiveIntensity: 0.4 });
-    const matWhite = new THREE.MeshStandardMaterial({ color: 0xfef9c3, roughness: 0.6 });
-    const matGreen = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.5 });
+    const matFlesh = new THREE.MeshStandardMaterial({ color: cfg.flesh, roughness: 0.4 });
+    const matActive = new THREE.MeshStandardMaterial({ color: cfg.active, roughness: 0.3, emissive: 0x881337, emissiveIntensity: 0.4 });
+    const matWhite = new THREE.MeshStandardMaterial({ color: cfg.inner, roughness: 0.6 });
+    const matGreen = new THREE.MeshStandardMaterial({ color: cfg.outer, roughness: 0.5 });
     const matSeed = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.5 });
     const seedGeo = new THREE.SphereGeometry(0.045, 10, 8);
+    const sesameGeo = new THREE.SphereGeometry(0.028, 8, 6);
+    const sesameMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.5 });
+    const pepperoniGeo = new THREE.SphereGeometry(0.075, 10, 8);
+    const pepperoniMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.5 });
+    const sprinkleGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.06, 6);
+    const sprinkleMats = [0xec4899, 0x3b82f6, 0xfbbf24, 0x22c55e, 0xf97316, 0xfef9c3].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.4 }));
+    const leafGeo = new THREE.SphereGeometry(0.05, 8, 6);
+    const leafMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.5 });
 
     const sliceGroups: THREE.Group[] = [];
 
@@ -125,17 +150,26 @@ export function Fraction3DSlice({
       greenShape.closePath();
       group.add(new THREE.Mesh(new THREE.ExtrudeGeometry(greenShape, { depth: sliceHeight, bevelEnabled: false }), matGreen));
 
-      // Biji di atas daging
-      const seedSpots = [
-        { r: radius * 0.45, a: mid },
-        { r: radius * 0.7, a: start + sliceAngle * 0.35 },
-        { r: radius * 0.7, a: start + sliceAngle * 0.65 },
-      ];
-      for (const sp of seedSpots) {
-        const seed = new THREE.Mesh(seedGeo, matSeed);
-        seed.position.set(Math.cos(sp.a) * sp.r, Math.sin(sp.a) * sp.r, sliceHeight + 0.02);
-        seed.scale.set(1, 1, 0.42);
-        group.add(seed);
+      // Topping di atas objek (biji / wijen / pepperoni / meses / daun)
+      if (cfg.topping !== "none") {
+        const count = cfg.topping === "sprinkles" ? 4 : cfg.topping === "sesame" ? 3 : cfg.topping === "pepperoni" ? 2 : 3;
+        for (let s = 0; s < count; s++) {
+          const rr = radius * (0.35 + ((s + 0.5) / count) * 0.55);
+          const aa = start + sliceAngle * ((s + 0.5) / count);
+          let geo: THREE.BufferGeometry;
+          let mat: THREE.Material;
+          if (cfg.topping === "seeds") { geo = seedGeo; mat = matSeed; }
+          else if (cfg.topping === "sesame") { geo = sesameGeo; mat = sesameMat; }
+          else if (cfg.topping === "pepperoni") { geo = pepperoniGeo; mat = pepperoniMat; }
+          else if (cfg.topping === "sprinkles") { geo = sprinkleGeo; mat = sprinkleMats[s % sprinkleMats.length]; }
+          else { geo = leafGeo; mat = leafMat; }
+          const topping = new THREE.Mesh(geo, mat);
+          topping.position.set(Math.cos(aa) * rr, Math.sin(aa) * rr, sliceHeight + 0.02);
+          if (cfg.topping === "leaf") topping.scale.set(1.4, 0.9, 0.4);
+          else if (cfg.topping === "sprinkles") topping.scale.set(1, 1, 1);
+          else topping.scale.set(1, 1, 0.45);
+          group.add(topping);
+        }
       }
 
       // Rebahkan (lokal XY → dunia XZ, tebal → sumbu Y)
