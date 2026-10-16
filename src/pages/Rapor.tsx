@@ -54,7 +54,7 @@ export default function Rapor() {
         subtitle={`${profil.nama} · ⭐ ${poin}/100 poin`}
         icon="📜"
         onBack={() => goBack("menu")}
-        colorScheme="teal"
+        colorScheme="orange"
       />
 
       <div className="mx-auto max-w-md px-4">
@@ -104,15 +104,29 @@ export default function Rapor() {
           )}
         </Card>
 
-        <PrimaryButton
-          onClick={() => {
-            sfx("success");
-            simpanRaporPDF(profil, riwayat, progress, poin);
-          }}
-          className="mt-4 w-full"
-        >
-          Simpan PDF 📄
-        </PrimaryButton>
+        <div className="mt-4 flex flex-col gap-2.5">
+          <PrimaryButton
+            onClick={() => {
+              sfx("tap");
+              navigate("rapor-cetak");
+            }}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <span>📄</span>
+            <span>Pratinjau &amp; Cetak PDF Laporan</span>
+          </PrimaryButton>
+
+          <button
+            onClick={() => {
+              sfx("success");
+              simpanRaporPDF(profil, riwayat, progress, poin);
+            }}
+            className="flex w-full items-center justify-center gap-1.5 rounded-2xl border-2 border-slate-300 bg-white py-2.5 font-display text-xs font-bold text-slate-700 shadow-sm transition active:scale-95 hover:bg-slate-50"
+          >
+            <span>⬇️</span>
+            <span>Unduh PDF Langsung (jsPDF)</span>
+          </button>
+        </div>
 
         <button
           onClick={() => setShowConfirmReset(true)}

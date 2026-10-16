@@ -182,15 +182,15 @@ export const SOAL: Soal[] = [
 
 /* ====================================================== TAHAP MASKOT */
 export const MASKOT_STAGES: MaskotStage[] = [
-  { level: 0, nama: "Pelajar", ambangBintang: 0 },
-  { level: 1, nama: "Detektif Muda", ambangBintang: 25 },
-  { level: 2, nama: "Ahli Pecahan", ambangBintang: 60 },
-  { level: 3, nama: "Profesor", ambangBintang: 100 },
+  { level: 1, nama: "Pelajar", ambangBintang: 0 },
+  { level: 2, nama: "Detektif Muda", ambangBintang: 25 },
+  { level: 3, nama: "Ahli Pecahan", ambangBintang: 60 },
+  { level: 4, nama: "Profesor", ambangBintang: 100 },
 ];
 
-/** Level maskot dari total poin (evolusi murni dari poin, maks 100). */
+/** Level maskot dari total poin (evolusi murni dari poin, level 1-4). */
 export function levelDariPoin(poin: number): number {
-  let level = 0;
+  let level = 1;
   for (const s of MASKOT_STAGES) if (poin >= s.ambangBintang) level = s.level;
   return level;
 }

@@ -835,7 +835,7 @@ function GamePlayEngine({
           {/* Customer Speech Bubble Banner */}
           <div className="p-3.5 pt-1 flex items-start gap-3">
             <div className="w-12 h-12 rounded-2xl bg-amber-300 border-2 border-amber-400 grid place-items-center shrink-0 shadow">
-              <Mascot gender={idx % 2 === 0 ? "cewe" : "cowo"} level={0} size={40} />
+              <Mascot gender={idx % 2 === 0 ? "cewe" : "cowo"} level={1} size={40} />
             </div>
 
             <div className="flex-1 bg-white text-slate-900 p-3 rounded-2xl border-2 border-amber-300 shadow-md relative">

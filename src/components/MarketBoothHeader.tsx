@@ -18,13 +18,13 @@ const OBJ: Record<string, ObjKind> = { m1: "semangka", m2: "kue-tart", m3: "kue-
  */
 export function AwningScallops({
   lightCount = 5,
-  colorScheme = "teal",
+  colorScheme = "orange",
 }: {
   lightCount?: number;
   colorScheme?: "teal" | "red" | "orange";
 }) {
   const scallopColor =
-    colorScheme === "red" ? "#b91c1c" : colorScheme === "orange" ? "#c2410c" : "#0f766e";
+    colorScheme === "red" ? "#b91c1c" : colorScheme === "orange" ? "#78350f" : "#0f766e";
 
   return (
     <div className="relative w-full overflow-hidden leading-none select-none">
@@ -137,7 +137,7 @@ export function HomeBoothHeader({
                 <div className="absolute inset-x-0 bottom-0 h-1.5 bg-amber-700 rounded-b-xl" />
               </div>
               <span className="absolute -bottom-1 -right-1 bg-amber-500 text-amber-950 text-[9px] font-black px-1.5 py-0.2 rounded-full border border-white shadow">
-                Lvl {maskotLevel + 1}
+                Lvl {maskotLevel}
               </span>
             </div>
           </div>
@@ -221,7 +221,7 @@ export function PageBoothHeader({
   icon = "🏪",
   onBack,
   rightElement,
-  colorScheme = "teal",
+  colorScheme = "orange",
 }: {
   title: string;
   subtitle?: string;

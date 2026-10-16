@@ -124,7 +124,7 @@ export default function MateriDetail({
 
       {/* ================= GERBANG ATAP & JUDUL (FIXED TOP) ================= */}
       <div className="sticky top-0 z-30 w-full select-none">
-        <Awning tone={materiId === "m1" ? "teal" : materiId === "m2" ? "orange" : "violet"} height={32} stripe={22} light="#fef08a" />
+        <Awning tone="orange" height={32} stripe={22} light="#fef08a" />
         {/* Tombol kembali floating di kiri atas kanopi */}
         <div className="relative w-full">
           <button

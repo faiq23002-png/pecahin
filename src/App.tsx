@@ -19,6 +19,7 @@ import RumahMaskot from "@/pages/RumahMaskot";
 import Stiker from "@/pages/Stiker";
 import Misi from "@/pages/Misi";
 import Rapor from "@/pages/Rapor";
+import RaporCetak from "@/pages/RaporCetak";
 import Menu from "@/pages/Menu";
 import Pengaturan from "@/pages/Pengaturan";
 function GameHub() {
@@ -68,7 +69,7 @@ function GameHub() {
 
       {/* ================= GERBANG ATAP & JUDUL (FIXED TOP) ================= */}
       <div className="sticky top-0 z-30 w-full select-none">
-        <Awning tone="red" height={32} stripe={22} light="#fff8f0" />
+        <Awning tone="orange" height={32} stripe={22} light="#fef08a" />
         <div className="-mt-1 flex items-center justify-between px-4 pb-1">
           <button
             type="button"
@@ -88,9 +89,9 @@ function GameHub() {
       </div>
 
       <div className="mx-auto max-w-md px-4 mt-3 space-y-3.5">
-        <div className="bg-amber-100 border border-amber-300 rounded-2xl p-3 text-center text-amber-950 font-bold text-xs shadow-sm flex items-center justify-center gap-2">
-          <span className="text-base">🏪</span>
-          <span>Selesaikan materi lapak untuk membuka stan game pedagang!</span>
+        <div className="bg-[#fef8ea] border-2 border-[#b45309]/40 rounded-2xl p-3 text-center text-[#78350f] font-black text-xs shadow-sm flex items-center justify-center gap-2">
+          <span className="text-base" aria-hidden>🗺️</span>
+          <span>Selesaikan materi lapak untuk membuka arena tantangan game!</span>
         </div>
 
         <div className="flex flex-col gap-3.5">
@@ -119,26 +120,34 @@ function GameHub() {
                   );
                 }}
                 disabled={terkunci}
-                className={`relative overflow-hidden rounded-3xl text-left shadow-lg transition-all active:scale-[0.98] border-2 ${
+                className={`group relative overflow-hidden rounded-2xl text-left transition-all active:translate-y-[2px] border-2 ${
                   terkunci
-                    ? "bg-white/95 border-slate-400 shadow-md"
-                    : "bg-white border-amber-400 hover:border-amber-500 shadow-xl"
+                    ? "bg-stone-100/95 border-stone-400/80 shadow-[0_3px_0_#78716c]"
+                    : "bg-gradient-to-r from-[#fffdfa] via-[#fdf6e6] to-[#faf0d9] border-[#451a03] shadow-[0_4px_0_#451a03] active:shadow-[0_1px_0_#451a03]"
                 }`}
               >
-                {/* Awning Striped Canopy Header */}
-                <div className={`${terkunci ? "bg-slate-400" : meta.awning} h-3.5 w-full border-b border-slate-300`} />
+                {/* List Atas Batang Kayu */}
+                <div
+                  className={`h-2 w-full ${
+                    terkunci
+                      ? "bg-stone-300"
+                      : "border-b border-[#451a03] bg-gradient-to-r from-[#78350f] via-[#b45309] to-[#78350f]"
+                  }`}
+                />
 
                 <div className="p-3.5 flex items-center gap-3">
-                  {/* Vendor Emoji Badge Frame (Tampilkan langsung ikonnya tanpa gradasi) */}
+                  {/* Badge Ikon Stan */}
                   <div
-                    className={`h-16 w-16 shrink-0 rounded-2xl grid place-items-center text-3xl shadow-md border-2 ${
-                      terkunci ? "border-slate-300 bg-slate-100 text-slate-800" : `border-white/60 ${meta.bg} text-white`
+                    className={`h-14 w-14 shrink-0 rounded-2xl grid place-items-center text-3xl shadow-sm border-2 ${
+                      terkunci
+                        ? "border-stone-300 bg-stone-200 text-stone-500"
+                        : "border-[#451a03] bg-gradient-to-b from-amber-100 to-amber-200 text-[#451a03] shadow-[0_2px_0_#451a03]"
                     } relative`}
                   >
-                    <span className="text-3xl">{meta.emoji}</span>
+                    <span className="text-3xl" aria-hidden>{meta.emoji}</span>
                     {terkunci && (
-                      <span className="absolute -top-1.5 -right-1.5 grid h-6 w-6 place-items-center rounded-full bg-slate-700 text-white shadow-md text-xs border border-white">
-                        <IconLock size={13} />
+                      <span className="absolute -top-1.5 -right-1.5 grid h-6 w-6 place-items-center rounded-full bg-stone-700 text-white shadow-md text-xs border border-white">
+                        <IconLock size={12} />
                       </span>
                     )}
                   </div>
@@ -146,31 +155,31 @@ function GameHub() {
                   {/* Info Stan Pedagang */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-display font-extrabold text-base text-slate-900 truncate">
+                      <span className={`font-display font-black text-base truncate ${terkunci ? "text-stone-600" : "text-[#451a03]"}`}>
                         {g.nama}
                       </span>
                     </div>
-                    <div className="text-xs font-bold text-teal-700 truncate">
+                    <div className={`text-xs font-bold truncate ${terkunci ? "text-stone-400" : "text-[#92400e]"}`}>
                       {meta.sellerRole}
                     </div>
 
                     {/* Skor Terbaik & Status */}
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       {terkunci ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-black bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-300">
-                          <IconLock size={12} /> Lapak Terkunci
+                        <span className="inline-flex items-center gap-1 text-[11px] font-black bg-stone-200 text-stone-700 px-2 py-0.5 rounded-lg border border-stone-300">
+                          <IconLock size={11} /> Lapak Belum Buka
                         </span>
                       ) : (
                         <>
-                          <span className="inline-flex items-center gap-1 text-[11px] font-black bg-green-500 text-white px-2 py-0.5 rounded-full shadow-xs">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-black bg-emerald-600 text-white px-2 py-0.5 rounded-lg border border-emerald-700 shadow-xs">
                             ✓ STAN BUKA
                           </span>
                           {skorTerbaik > 0 ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-black bg-amber-100 text-amber-950 border border-amber-300 px-2.5 py-0.5 rounded-full shadow-xs">
-                              🏆 Rekor: <span className="text-orange-600 font-black">{skorTerbaik}/10 Benar</span>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-black bg-amber-100 text-amber-950 border border-amber-400 px-2 py-0.5 rounded-lg shadow-xs">
+                              🏆 Rekor: <span className="text-[#b45309] font-black">{skorTerbaik}/10 Benar</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-stone-500 bg-[#fef8ea] px-2 py-0.5 rounded-lg border border-stone-200">
                               ⭐ Belum Dimainkan
                             </span>
                           )}
@@ -180,10 +189,21 @@ function GameHub() {
                   </div>
 
                   {/* Arrow Indicator */}
-                  <div className="shrink-0 text-slate-400 font-black text-xl">
-                    {terkunci ? <IconLock size={20} /> : <span className="text-amber-600">›</span>}
+                  <div className="shrink-0">
+                    {terkunci ? (
+                      <div className="rounded-xl border border-stone-300 bg-stone-200/70 p-2 text-stone-500">
+                        <IconLock size={16} />
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border-2 border-[#451a03] bg-gradient-to-b from-amber-300 to-amber-400 p-2 text-[#451a03] shadow-[0_2px_0_#451a03] transition group-hover:translate-x-0.5">
+                        <span className="block font-black text-sm leading-none">➔</span>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {/* List Kayu Bawah */}
+                <div className="h-1.5 w-full border-t border-[#451a03]/20 bg-[#78350f]/10" />
               </button>
             );
           })}
@@ -239,7 +259,8 @@ function AppRoutes() {
     case "misi":
       return <Misi />;
     case "rapor":
-      return <Rapor />;
+    case "rapor-cetak":
+      return <RaporCetak />;
     case "menu":
       return <Menu />;
     case "pengaturan":
@@ -251,6 +272,20 @@ function AppRoutes() {
 
 export default function App() {
   const [initialLoading, setInitialLoading] = React.useState(true);
+  const { profil } = useApp();
+
+  React.useEffect(() => {
+    if (profil) {
+      import("@/lib/audio").then(({ setAudioMuted, setVolumeMusik, setVolumeSfx, initOrPlayBgm }) => {
+        setAudioMuted(!profil.suaraOn);
+        setVolumeMusik(profil.volumeMusik ?? 70);
+        setVolumeSfx(profil.volumeSfx ?? 80);
+        if (profil.suaraOn) {
+          initOrPlayBgm();
+        }
+      });
+    }
+  }, [profil?.suaraOn, profil?.volumeMusik, profil?.volumeSfx]);
 
   return (
     <AppProvider>

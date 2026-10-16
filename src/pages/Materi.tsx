@@ -1,94 +1,157 @@
 /**
  * Materi.tsx
- * Peta Petualangan Belajar Pasar PECAH-IN (Gaya Winding Road Pathway — contoh peta.jpg).
+ * Peta Petualangan Gulungan Perkamen Harta Karun (Treasure Scroll Map).
+ * Seluruh komponen visual (Header Zona, Tab Wilayah, Card Pos Ekspedisi, dan Gerbang Puncak)
+ * dirancang penuh dengan tekstur perkamen kayu kuno, segel lilin medali, dan jahitan tinta klasik.
  */
 import React, { useState } from "react";
 import { useRouter } from "@/lib/router-context";
 import { useApp } from "@/lib/profil-context";
-import { MATERI } from "@/lib/content";
 import { semuaSelesai } from "@/lib/progress";
 import { BottomNav } from "@/components/BottomNav";
-import { IconLock, IconFlag, IconBack } from "@/components/icons";
+import { IconBack, IconLock } from "@/components/icons";
 import { sfx } from "@/lib/audio";
-import { PageBoothHeader } from "@/components/MarketBoothHeader";
 import { FractionShape } from "@/components/FractionShape";
 import { Awning, HangingSign } from "@/components/MarketProps";
+import { Mascot } from "@/components/Mascot";
 
-const MAP_THEMES: Record<
-  string,
-  {
-    title: string;
-    sub: string;
-    bgColor: string;
-    cardBg: string;
-    pathColor: string;
-    accent: string;
-    kind: "semangka" | "kue-tart" | "kue-batang";
-    stages: { id: string; title: string; desc: string; icon: string }[];
-  }
-> = {
-  m1: {
-    title: "LAPAK 1: KENAL PECAHAN",
-    sub: "Kebun Semangka & Potongan Adil",
-    bgColor: "bg-[#D1F4E0]",
-    cardBg: "bg-emerald-50 border-emerald-300",
-    pathColor: "#10B981",
-    accent: "bg-emerald-600 text-white",
-    kind: "semangka",
-    stages: [
-      { id: "tahapBelajar", title: "1. Ayo Belajar 🧠", desc: "Konsep Dasar & Potongan", icon: "🍉" },
-      { id: "tahapCoba", title: "2. Ayo Coba 🎮", desc: "Arsir & Bagi Rata", icon: "🍽️" },
-      { id: "tahapLatihan", title: "3. Ayo Latihan ✏️", desc: "Tantangan 10 Soal", icon: "⭐" },
-    ],
-  },
-  m2: {
-    title: "LAPAK 2: PECAHAN SENILAI",
-    sub: "Toko Kue & Banding Ukuran",
-    bgColor: "bg-[#FDF4C7]",
-    cardBg: "bg-amber-50 border-amber-300",
-    pathColor: "#F59E0B",
-    accent: "bg-amber-500 text-white",
-    kind: "kue-tart",
-    stages: [
-      { id: "tahapBelajar", title: "1. Ayo Belajar 🧠", desc: "Pecahan Senilai & Banding", icon: "🍰" },
-      { id: "tahapCoba", title: "2. Ayo Coba 🎮", desc: "Eksperimen Kue Senilai", icon: "🍕" },
-      { id: "tahapLatihan", title: "3. Ayo Latihan ✏️", desc: "Tantangan 10 Soal", icon: "⭐" },
-    ],
-  },
-  m3: {
-    title: "LAPAK 3: PENJUMLAHAN",
-    sub: "Pasar Utama & Soal Cerita",
-    bgColor: "bg-[#D7F3FE]",
-    cardBg: "bg-sky-50 border-sky-300",
-    pathColor: "#0EA5E9",
-    accent: "bg-sky-600 text-white",
-    kind: "kue-batang",
-    stages: [
-      { id: "tahapBelajar", title: "1. Ayo Belajar 🧠", desc: "Tambah Pembilang & Kata Kunci", icon: "📜" },
-      { id: "tahapCoba", title: "2. Ayo Coba 🎮", desc: "Gabung Potongan Kue", icon: "🥖" },
-      { id: "tahapLatihan", title: "3. Ayo Latihan ✏️", desc: "Tantangan 10 Soal", icon: "⭐" },
-    ],
-  },
+type QuestStop = {
+  materiId: string;
+  tahapId: "tahapBelajar" | "tahapCoba" | "tahapLatihan";
+  stopNum: number;
+  title: string;
+  subtitle: string;
+  badgeText: string;
+  icon: string;
+  isBossChest?: boolean;
 };
+
+type TerritoryScroll = {
+  id: string;
+  territoryNum: string;
+  title: string;
+  sub: string;
+  sealColor: string;
+  sealBg: string;
+  kind: "semangka" | "kue-tart" | "kue-batang";
+  stops: QuestStop[];
+};
+
+const SCROLL_TERRITORIES: TerritoryScroll[] = [
+  {
+    id: "m1",
+    territoryNum: "WILAYAH I",
+    title: "Lembah Kebun Semangka",
+    sub: "Mengenal Pecahan & Potongan Adil",
+    sealColor: "text-emerald-900 border-emerald-900/60 bg-emerald-200/80",
+    sealBg: "from-emerald-500 to-emerald-700",
+    kind: "semangka",
+    stops: [
+      { materiId: "m1", tahapId: "tahapBelajar", stopNum: 1, title: "Ayo Belajar", subtitle: "Gulungan Konsep Dasar", badgeText: "Teori", icon: "📜" },
+      { materiId: "m1", tahapId: "tahapCoba", stopNum: 2, title: "Ayo Coba", subtitle: "Praktik Potong Sama Besar", badgeText: "Praktik", icon: "🍉" },
+      { materiId: "m1", tahapId: "tahapLatihan", stopNum: 3, title: "Ujian Lapak 1", subtitle: "Tantangan 10 Soal Semangka", badgeText: "Peti Harta", icon: "🧰", isBossChest: true },
+    ],
+  },
+  {
+    id: "m2",
+    territoryNum: "WILAYAH II",
+    title: "Pelabuhan Toko Kue",
+    sub: "Pecahan Senilai & Banding Ukuran",
+    sealColor: "text-amber-900 border-amber-900/60 bg-amber-200/80",
+    sealBg: "from-amber-500 to-amber-700",
+    kind: "kue-tart",
+    stops: [
+      { materiId: "m2", tahapId: "tahapBelajar", stopNum: 4, title: "Ayo Belajar", subtitle: "Rahasia Pecahan Senilai", badgeText: "Teori", icon: "🧭" },
+      { materiId: "m2", tahapId: "tahapCoba", stopNum: 5, title: "Ayo Coba", subtitle: "Eksperimen Kue & Pizza", badgeText: "Praktik", icon: "🍰" },
+      { materiId: "m2", tahapId: "tahapLatihan", stopNum: 6, title: "Ujian Lapak 2", subtitle: "Tantangan 10 Soal Toko Kue", badgeText: "Peti Harta", icon: "🧰", isBossChest: true },
+    ],
+  },
+  {
+    id: "m3",
+    territoryNum: "WILAYAH III",
+    title: "Benteng Bazaar Utama",
+    sub: "Penjumlahan Pecahan & Soal Cerita",
+    sealColor: "text-rose-900 border-rose-900/60 bg-rose-200/80",
+    sealBg: "from-rose-500 to-rose-700",
+    kind: "kue-batang",
+    stops: [
+      { materiId: "m3", tahapId: "tahapBelajar", stopNum: 7, title: "Ayo Belajar", subtitle: "Aturan Penjumlahan Porsi", badgeText: "Teori", icon: "📖" },
+      { materiId: "m3", tahapId: "tahapCoba", stopNum: 8, title: "Ayo Coba", subtitle: "Pesanan Gabungan Pembeli", badgeText: "Praktik", icon: "🧺" },
+      { materiId: "m3", tahapId: "tahapLatihan", stopNum: 9, title: "Ujian Lapak 3", subtitle: "Tantangan 10 Soal Cerita", badgeText: "Peti Harta", icon: "🧰", isBossChest: true },
+    ],
+  },
+];
+
+/** Komponen Batang Kayu Penggulung Peta (Atas / Bawah) */
+function WoodenScrollRoller() {
+  return (
+    <div className="relative mx-auto flex w-full items-center justify-center select-none">
+      {/* Ujung Knop Kayu Kiri */}
+      <div className="h-6 w-4 shrink-0 rounded-l-md border-2 border-r-0 border-[#3e2412] bg-gradient-to-b from-[#d97706] via-[#92400e] to-[#451a03] shadow-md" />
+      {/* Cincin Emas Kiri */}
+      <div className="h-5 w-2 shrink-0 border-y-2 border-[#3e2412] bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-700" />
+      {/* Batang Utama Kayu Jati */}
+      <div className="h-4 flex-1 border-2 border-[#3e2412] bg-gradient-to-b from-[#b45309] via-[#78350f] to-[#451a03] shadow-[0_4px_6px_rgba(0,0,0,0.45)]" />
+      {/* Cincin Emas Kanan */}
+      <div className="h-5 w-2 shrink-0 border-y-2 border-[#3e2412] bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-700" />
+      {/* Ujung Knop Kayu Kanan */}
+      <div className="h-6 w-4 shrink-0 rounded-r-md border-2 border-l-0 border-[#3e2412] bg-gradient-to-b from-[#d97706] via-[#92400e] to-[#451a03] shadow-md" />
+    </div>
+  );
+}
+
+/** Ikon Mawar Kompas Klasik SVG */
+function CompassRose({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} fill="none" aria-hidden>
+      <circle cx="32" cy="32" r="26" stroke="#78350f" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.45" />
+      <circle cx="32" cy="32" r="18" stroke="#78350f" strokeWidth="1.2" opacity="0.35" />
+      <polygon points="32,4 37,27 32,23 27,27" fill="#b91c1c" opacity="0.65" />
+      <polygon points="32,60 37,37 32,41 27,37" fill="#78350f" opacity="0.5" />
+      <polygon points="4,32 27,27 23,32 27,37" fill="#78350f" opacity="0.5" />
+      <polygon points="60,32 37,27 41,32 37,37" fill="#78350f" opacity="0.5" />
+      <circle cx="32" cy="32" r="3.5" fill="#78350f" />
+    </svg>
+  );
+}
 
 export default function Materi() {
   const { navigate, goBack } = useRouter();
-  const { progress, modeJuri } = useApp();
-  const [selectedMateri, setSelectedMateri] = useState<string>("m1");
+  const { progress, modeJuri, profil, maskotLevel } = useApp();
+  const [activeTerritoryId, setActiveTerritoryId] = useState<string>("m1");
 
-  const activeTheme = MAP_THEMES[selectedMateri];
-  const activeProg = progress[selectedMateri] ?? { tahapBelajar: "terkunci", tahapCoba: "terkunci", tahapLatihan: "terkunci" };
   const semua = semuaSelesai(progress) || modeJuri;
+  const territory = SCROLL_TERRITORIES.find((t) => t.id === activeTerritoryId) ?? SCROLL_TERRITORIES[0];
+  const prog = progress[territory.id] ?? {
+    tahapBelajar: "terkunci",
+    tahapCoba: "terkunci",
+    tahapLatihan: "terkunci",
+    selesai: false,
+  };
 
-  const activeDoneCount =
-    (activeProg.tahapBelajar === "selesai" ? 1 : 0) +
-    (activeProg.tahapCoba === "selesai" ? 1 : 0) +
-    (activeProg.tahapLatihan === "selesai" ? 1 : 0);
-  const activePct = Math.round((activeDoneCount / 3) * 100);
+  // Hitung total pos selesai dari 9 pos
+  const totalStopsDone = SCROLL_TERRITORIES.reduce((acc, t) => {
+    const p = progress[t.id];
+    if (!p) return acc;
+    return (
+      acc +
+      (p.tahapBelajar === "selesai" ? 1 : 0) +
+      (p.tahapCoba === "selesai" ? 1 : 0) +
+      (p.tahapLatihan === "selesai" ? 1 : 0)
+    );
+  }, 0);
+
+  // Cari tahap aktif tempat karakter Peco/Pica berdiri
+  const currentActiveStop = (() => {
+    if (prog.tahapBelajar !== "selesai") return "tahapBelajar";
+    if (prog.tahapCoba !== "selesai") return "tahapCoba";
+    if (prog.tahapLatihan !== "selesai") return "tahapLatihan";
+    return "completed";
+  })();
 
   return (
-    <div className="min-h-screen pb-24 select-none relative">
-      {/* Background Layer Statis yang Tidak Bergerak / Tidak Zoom saat Discroll */}
+    <div className="min-h-screen pb-28 select-none relative">
+      {/* Background Pasar Tradisional */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
         <img
           src="/bgpasar.jpg"
@@ -96,243 +159,298 @@ export default function Materi() {
           className="absolute inset-0 h-full w-full object-cover object-center pointer-events-none"
           style={{ transform: "translateZ(0)" }}
         />
-        <div className="absolute inset-0 bg-slate-900/25 pointer-events-none" />
+        <div className="absolute inset-0 bg-slate-950/45 pointer-events-none" />
       </div>
 
       {/* ================= GERBANG ATAP & JUDUL (FIXED TOP) ================= */}
-      <div className="sticky top-0 z-30 w-full select-none">
-        <Awning tone="green" height={32} stripe={22} light="#fef08a" />
+      <div className="fixed top-0 inset-x-0 z-30 select-none">
+        <Awning tone="orange" height={32} stripe={22} light="#fef08a" />
         <div className="-mt-1 flex items-center justify-between px-4 pb-1">
           <button
             type="button"
-            onClick={() => goBack("menu")}
+            onClick={() => goBack("home")}
             aria-label="Kembali"
             className="grid h-10 w-10 place-items-center rounded-xl border-2 border-ink bg-white shadow-[0_3px_0_#1e293b] active:translate-y-[2px] active:shadow-[0_1px_0_#1e293b]"
           >
             <IconBack size={20} className="text-ink" />
           </button>
           <HangingSign rope={10}>
-            <span className="font-display text-sm font-extrabold uppercase tracking-[0.18em] text-white [text-shadow:0_1px_0_rgba(0,0,0,.4)]">
-              Peta Belajar Pecahan
+            <span className="font-display text-sm font-extrabold uppercase tracking-[0.15em] text-white [text-shadow:0_1px_0_rgba(0,0,0,.4)]">
+              Peta Harta Saudagar
             </span>
           </HangingSign>
-          <div className="w-10" />
+          <div className="flex items-center gap-1 rounded-xl border-2 border-ink bg-amber-300 px-2.5 py-1 shadow-[0_3px_0_#1e293b]">
+            <span className="text-xs">🧭</span>
+            <span className="font-display text-xs font-black text-ink tabular-nums">{totalStopsDone}/9</span>
+          </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-md px-4 pt-3">
-        {/* Theme Floor / Lapak Tabs with Progress Bar */}
-        <div className="flex justify-between gap-1.5 bg-white/95 p-2 rounded-2xl shadow-md border border-slate-200 mb-3">
-          {MATERI.map((m) => {
-            const isSelected = selectedMateri === m.id;
-            const p = progress[m.id];
+      {/* Spacer tinggi agar konten peta tidak tertutup oleh header fixed top */}
+      <div className="h-[76px]" />
+
+      <div className="mx-auto max-w-md px-3.5 pt-3">
+        {/* ================= TAB WILAYAH EKSPEDISI BERTEMA SEGEL PERKAMEN ================= */}
+        <div className="mb-3.5 grid grid-cols-3 gap-2">
+          {SCROLL_TERRITORIES.map((t, idx) => {
+            const isSelected = t.id === activeTerritoryId;
+            const p = progress[t.id];
             const isLocked = p?.tahapBelajar === "terkunci" && !modeJuri;
             const doneCount =
               (p?.tahapBelajar === "selesai" ? 1 : 0) +
               (p?.tahapCoba === "selesai" ? 1 : 0) +
               (p?.tahapLatihan === "selesai" ? 1 : 0);
-            const pct = Math.round((doneCount / 3) * 100);
 
             return (
               <button
-                key={m.id}
+                key={t.id}
                 type="button"
                 onClick={() => {
-                  setSelectedMateri(m.id);
                   sfx("pop");
+                  setActiveTerritoryId(t.id);
                 }}
-                className={`flex-1 py-2 px-1.5 rounded-xl text-xs font-black transition flex flex-col items-center gap-1 ${
+                className={`relative flex flex-col items-center rounded-2xl border-2 px-2 py-2 transition active:translate-y-[2px] ${
                   isSelected
-                    ? "bg-teal-700 text-white shadow-md scale-[1.02]"
+                    ? "border-[#451a03] bg-gradient-to-b from-[#fef3c7] to-[#fde68a] text-[#451a03] shadow-[0_4px_0_#451a03] ring-2 ring-amber-300"
                     : isLocked
-                    ? "bg-slate-100 text-slate-400"
-                    : "bg-white text-slate-700 hover:bg-slate-50"
+                    ? "border-[#78350f]/30 bg-[#ebd5b3]/70 text-[#78350f]/50"
+                    : "border-[#78350f] bg-[#fbf0d9] text-[#451a03] shadow-[0_3px_0_#78350f]"
                 }`}
               >
-                <span>{m.id === "m1" ? "🍉 LAPAK 1" : m.id === "m2" ? "🍰 LAPAK 2" : "📜 LAPAK 3"}</span>
-                {/* Mini Progress Bar inside tab */}
-                <div className="w-full px-1">
-                  <div className={`h-1.5 w-full rounded-full overflow-hidden ${isSelected ? "bg-teal-900/50" : "bg-slate-200"}`}>
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${isSelected ? "bg-amber-300" : "bg-emerald-500"}`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-                <span className="text-[9px] font-bold opacity-90">
-                  {p?.selesai ? "✓ 3/3 Selesai" : isLocked ? "🔒 Kunci" : `${doneCount}/3 Selesai`}
+                <span className="text-[10px] font-black tracking-wider uppercase opacity-80">
+                  Peta {idx + 1}
+                </span>
+                <span className="mt-0.5 font-display text-xs font-black truncate w-full text-center">
+                  {idx === 0 ? "🍉 Semangka" : idx === 1 ? "🍰 Toko Kue" : "📜 Bazaar"}
+                </span>
+                <span className="mt-1 rounded-full border border-[#78350f]/20 bg-[#78350f]/10 px-2 py-0.5 text-[9px] font-black">
+                  {p?.selesai ? "✓ Tuntas" : isLocked ? "🔒 Terkunci" : `${doneCount}/3 Pos`}
                 </span>
               </button>
             );
           })}
         </div>
 
-        {/* Banner Informatif Lapak dengan Bar Progres */}
-        <div className={`p-4 rounded-3xl border-2 shadow-md mb-4 ${activeTheme.cardBg}`}>
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-wider text-slate-600">
-                {activeTheme.title}
-              </div>
-              <div className="font-display text-base font-extrabold text-slate-900">
-                {activeTheme.sub}
-              </div>
-            </div>
-            <div className="h-12 w-12 shrink-0">
-              <FractionShape kind={activeTheme.kind} n={4} k={3} />
-            </div>
-          </div>
+        {/* ================= GULUNGAN PERKAMEN UTAMA (TREASURE SCROLL) ================= */}
+        <div className="relative">
+          {/* Batang Kayu Penggulung Atas */}
+          <WoodenScrollRoller />
 
-          {/* Bar Progres Lapak Aktif */}
-          <div className="mt-3 pt-2.5 border-t border-slate-300/60">
-            <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-1">
-              <span>Progres Lapak ini</span>
-              <span className="text-teal-800 font-extrabold">{activeDoneCount} / 3 Tahap Selesai ({activePct}%)</span>
-            </div>
-            <div className="h-3 w-full bg-slate-200/80 rounded-full overflow-hidden shadow-inner border border-slate-300/40">
-              <div
-                className="h-full bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 rounded-full transition-all duration-500 shadow"
-                style={{ width: `${activePct}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Straight Pathway Canvas */}
-        <div className="relative min-h-[480px] py-4">
-          {/* SVG Straight Neon Pathway Line */}
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden
+          {/* Lembaran Kertas Perkamen Kuno */}
+          <div
+            className="relative mx-2 border-x-4 border-[#5c3418] bg-[#f7e6c4] px-4 py-5 shadow-[inset_0_0_32px_rgba(146,64,14,0.35),0_10px_25px_rgba(0,0,0,0.45)]"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgba(120, 53, 15, 0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(217, 119, 6, 0.12), transparent 15%, transparent 85%, rgba(120, 53, 15, 0.2))",
+              backgroundSize: "18px 18px, 100% 100%",
+            }}
           >
-            <path
-              d="M 50 95 L 50 5"
-              fill="none"
-              stroke="#00F0FF"
-              strokeWidth="12"
-              strokeLinecap="round"
-              className="opacity-50"
-              vectorEffect="non-scaling-stroke"
-            />
-            <path
-              d="M 50 95 L 50 5"
-              fill="none"
-              stroke={activeTheme.pathColor}
-              strokeWidth="6"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-            <path
-              d="M 50 95 L 50 5"
-              fill="none"
-              stroke="#FFFFFF"
-              strokeWidth="3"
-              strokeDasharray="3 4"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
+            {/* Mawar Kompas Transparan di Sudut Kertas */}
+            <CompassRose className="pointer-events-none absolute top-3 right-3 h-16 w-16" />
 
-          {/* Stage Node Cards sitting straight in a single column */}
-          <div className="relative flex flex-col items-center justify-between gap-10 pt-2 pb-6">
-            {activeTheme.stages.map((stg) => {
-              const statusKey = stg.id as "tahapBelajar" | "tahapCoba" | "tahapLatihan";
-              const isDone = activeProg[statusKey] === "selesai";
-              const isLocked = activeProg[statusKey] === "terkunci" && !modeJuri;
+            {/* Bingkai Garis Tinta Klasik di Dalam Peta */}
+            <div className="rounded-2xl border-2 border-dashed border-[#92400e]/50 p-3.5 relative bg-[#fdf5e2]/60">
+              
+              {/* Header Wilayah di Atas Perkamen */}
+              <div className="flex items-center gap-3 border-b-2 border-[#92400e]/30 pb-3">
+                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border-2 border-[#451a03] bg-[#fffbeb] p-1.5 shadow-[0_3px_0_#451a03]">
+                  <FractionShape kind={territory.kind} n={4} k={3} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className={`inline-block rounded-md border px-2 py-0.5 text-[9px] font-black tracking-widest uppercase ${territory.sealColor}`}>
+                    {territory.territoryNum}
+                  </span>
+                  <h2 className="mt-0.5 font-display text-base font-black text-[#3e2412] leading-tight">
+                    {territory.title}
+                  </h2>
+                  <p className="text-[11px] font-bold text-[#78350f]">{territory.sub}</p>
+                </div>
+              </div>
 
-              return (
-                <div key={stg.id} className="w-[92%] self-center z-10">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (isLocked) {
-                        sfx("wrong");
-                        return;
-                      }
-                      sfx("tap");
-                      navigate(`materi${selectedMateri}-${stg.id}`);
-                    }}
-                    disabled={isLocked}
-                    className={`relative w-full rounded-3xl p-3.5 text-left border-3 shadow-lg transition-all active:scale-95 ${
-                      isDone
-                        ? "bg-white border-green-500 ring-4 ring-green-400/20"
-                        : !isLocked
-                        ? "bg-white border-teal-500 ring-4 ring-teal-400/30"
-                        : "bg-slate-100 border-slate-300 opacity-70"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-amber-300 grid place-items-center text-2xl shrink-0 shadow-sm">
-                        <span>{isLocked ? "🔒" : stg.icon}</span>
-                      </div>
+              {/* ================= JALUR TINTA JEJAK PETUALANGAN & 3 CARD POS PERKAMEN ================= */}
+              <div className="relative mt-5 space-y-4">
+                {/* Garis Vertikal Jejak Tinta Menghubungkan Pos 1 -> 2 -> 3 */}
+                <div
+                  className="pointer-events-none absolute top-8 bottom-8 left-7 w-1 border-l-3 border-dashed border-[#78350f]/60"
+                  aria-hidden
+                />
 
-                      <div className="flex-1 min-w-0">
-                        <div className="font-display font-black text-sm text-slate-900 truncate">
-                          {stg.title}
+                {territory.stops.map((stop) => {
+                  const st = prog[stop.tahapId];
+                  const isDone = st === "selesai";
+                  const isLocked = st === "terkunci" && !modeJuri;
+                  const isCurrent = currentActiveStop === stop.tahapId && !isLocked;
+
+                  return (
+                    <div key={stop.tahapId} className="relative flex items-center gap-3.5 z-10">
+                      
+                      {/* Segel Medali Bulat / Peti Harta di Kiri */}
+                      <div className="relative shrink-0">
+                        <div
+                          className={`grid h-14 w-14 place-items-center rounded-full border-3 transition ${
+                            isDone
+                              ? "border-[#065f46] bg-gradient-to-b from-emerald-400 to-emerald-600 text-white shadow-[0_4px_0_#064e3b]"
+                              : !isLocked
+                              ? "border-[#451a03] bg-gradient-to-b from-amber-300 via-amber-400 to-amber-600 text-[#451a03] shadow-[0_4px_0_#451a03] ring-4 ring-amber-300/70"
+                              : "border-[#78350f]/50 bg-[#e7d4b5] text-[#78350f]/60 shadow-[0_3px_0_rgba(120,53,15,0.3)]"
+                          }`}
+                        >
+                          {isLocked ? (
+                            <IconLock size={20} className="text-[#78350f]/60" />
+                          ) : (
+                            <span className="text-2xl drop-shadow-xs">{stop.icon}</span>
+                          )}
                         </div>
-                        <div className="text-xs font-bold text-slate-500 truncate">
-                          {stg.desc}
-                        </div>
-                      </div>
 
-                      <div className="shrink-0">
-                        {isDone ? (
-                          <span className="bg-green-600 text-white text-xs font-black px-2.5 py-1 rounded-full shadow flex items-center gap-1">
-                            ✓ Ulangi 🔄
-                          </span>
-                        ) : !isLocked ? (
-                          <span className="bg-teal-600 text-white text-xs font-black px-2.5 py-1 rounded-full shadow flex items-center gap-1">
-                            Buka 🛒
-                          </span>
-                        ) : (
-                          <span className="bg-slate-300 text-slate-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                            Kunci 🔒
+                        {/* Nomor Urut Segel */}
+                        <span className="absolute -top-1 -left-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#451a03] bg-[#fffbeb] font-display text-[11px] font-black text-[#451a03] shadow">
+                          {stop.stopNum}
+                        </span>
+
+                        {/* Bendera Ceklis Selesai */}
+                        {isDone && (
+                          <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#451a03] bg-amber-300 text-xs font-black text-[#451a03] shadow">
+                            🚩
                           </span>
                         )}
                       </div>
-                    </div>
-                  </button>
-                </div>
-              );
-            })}
 
-            {/* Festival Parcel Challenge (Panggung Game) */}
-            <div className="w-[85%] self-center mt-4 z-10">
-              <button
-                type="button"
-                onClick={() => {
-                  if (!semua) {
-                    sfx("wrong");
-                    return;
-                  }
-                  sfx("tap");
-                  navigate("game-campuran");
-                }}
-                disabled={!semua}
-                className={`w-full rounded-3xl p-3.5 text-left border-3 shadow-xl transition-all ${
-                  semua
-                    ? "bg-amber-400 border-amber-500 text-amber-950 active:scale-95"
-                    : "bg-slate-200 border-slate-300 text-slate-500 opacity-70"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-white border-2 border-amber-500 grid place-items-center text-2xl shrink-0 shadow">
-                    <span>{semua ? "🏆" : "🔒"}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-display text-sm font-black truncate">
-                      Panggung Festival Pasar 🎪
+                      {/* Card Pos Perkamen Harta Karun (Ukuran Seragam & Rapi) */}
+                      <button
+                        type="button"
+                        disabled={isLocked}
+                        onClick={() => {
+                          if (isLocked) {
+                            sfx("wrong");
+                            return;
+                          }
+                          sfx("tap");
+                          navigate(`materi${stop.materiId}-${stop.tahapId}`);
+                        }}
+                        className={`group relative flex-1 overflow-hidden rounded-2xl border-2 p-3 text-left transition active:translate-y-[2px] ${
+                          isDone
+                            ? "border-[#065f46] bg-gradient-to-r from-[#fefbf0] to-[#ecfdf5] shadow-[0_4px_0_#065f46]"
+                            : !isLocked
+                            ? "border-[#451a03] bg-gradient-to-r from-[#fffbeb] to-[#fef3c7] shadow-[0_4px_0_#451a03] ring-2 ring-amber-400/80"
+                            : "border-[#78350f]/40 bg-[#efe0c4]/80 opacity-75 shadow-[0_2px_0_rgba(120,53,15,0.2)]"
+                        }`}
+                      >
+                        {/* Aksen Pinggiran Perkamen Timbul */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={`rounded px-1.5 py-0.5 text-[9px] font-black uppercase border ${
+                                  stop.isBossChest
+                                    ? "bg-amber-300 text-[#451a03] border-[#451a03]"
+                                    : "bg-[#f3e3c3] text-[#78350f] border-[#78350f]/40"
+                                }`}
+                              >
+                                {stop.badgeText}
+                              </span>
+                              <span className="font-display text-sm font-black text-[#3e2412] truncate">
+                                {stop.title}
+                              </span>
+                            </div>
+                            <p className="mt-0.5 text-xs font-bold text-[#78350f] truncate">
+                              {stop.subtitle}
+                            </p>
+
+                            {/* Baris Status Bintang / Tombol Aksi */}
+                            <div className="mt-2 flex items-center justify-between">
+                              {stop.isBossChest ? (
+                                <div className="flex items-center gap-0.5 text-xs">
+                                  {[1, 2, 3].map((s) => (
+                                    <span key={s} className={isDone ? "text-amber-500" : "text-[#c4b093]"}>
+                                      ★
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-[10px] font-black text-[#92400e]">
+                                  {isDone ? "✓ Ekspedisi Selesai" : isLocked ? "🔒 Belum Terbuka" : "🧭 Siap Dijelajahi"}
+                                </span>
+                              )}
+
+                              <span
+                                className={`rounded-lg px-2.5 py-0.5 text-[10px] font-black uppercase transition ${
+                                  isDone
+                                    ? "bg-emerald-100 text-emerald-800 border border-emerald-400"
+                                    : !isLocked
+                                    ? "bg-amber-400 text-[#451a03] border border-[#451a03] group-hover:scale-105"
+                                    : "bg-[#dfcbb0] text-[#78350f]"
+                                }`}
+                              >
+                                {isDone ? "Ulangi" : isLocked ? "Kunci" : "Jelajahi ➔"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Karakter Maskot Peco/Pica Berdiri di Pos Aktif */}
+                          {isCurrent && (
+                            <div className="shrink-0 flex flex-col items-center pl-1 animate-bounce">
+                              <div className="h-12 w-12">
+                                <Mascot gender={profil?.gender ?? "cowo"} level={maskotLevel} size={48} />
+                              </div>
+                              <span className="rounded bg-amber-400 px-1.5 py-0.2 text-[8px] font-black text-[#451a03] border border-[#451a03] shadow-xs">
+                                Di Sini!
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </button>
                     </div>
-                    <div className="text-xs font-bold opacity-90 truncate">
-                      {semua ? "Mainkan Tantangan Campuran Pasar!" : "Selesaikan semua lapak dulu"}
+                  );
+                })}
+              </div>
+
+              {/* ================= CARD HARTA KARUN UTAMA: GRAND BAZAAR ================= */}
+              <div className="mt-6 border-t-2 border-dashed border-[#92400e]/40 pt-4">
+                <button
+                  type="button"
+                  disabled={!semua}
+                  onClick={() => {
+                    if (!semua) {
+                      sfx("wrong");
+                      return;
+                    }
+                    sfx("unlock");
+                    navigate("game-campuran");
+                  }}
+                  className={`w-full rounded-2xl border-2 p-3 text-left transition active:translate-y-[2px] ${
+                    semua
+                      ? "border-[#451a03] bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 shadow-[0_4px_0_#451a03]"
+                      : "border-[#78350f]/40 bg-[#ead8ba] opacity-80 shadow-[0_2px_0_rgba(120,53,15,0.2)]"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-[#451a03] bg-[#fffbeb] text-2xl shadow-xs">
+                      {semua ? "👑" : "🔒"}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="rounded bg-[#78350f] px-1.5 py-0.5 text-[9px] font-black text-amber-100 uppercase">
+                          Harta Utama
+                        </span>
+                        <span className="font-display text-sm font-black text-[#3e2412] truncate">
+                          Istana Grand Bazaar
+                        </span>
+                      </div>
+                      <p className="text-[11px] font-bold text-[#78350f] truncate mt-0.5">
+                        {semua
+                          ? "Seluruh ekspedisi tuntas! Masuk ke tantangan raja pasar!"
+                          : "Selesaikan ketiga wilayah peta untuk membuka harta utama"}
+                      </p>
                     </div>
                   </div>
-                </div>
-              </button>
+                </button>
+              </div>
+
             </div>
           </div>
+
+          {/* Batang Kayu Penggulung Bawah */}
+          <WoodenScrollRoller />
         </div>
       </div>
 

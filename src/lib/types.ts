@@ -36,6 +36,8 @@ export interface Profil {
   streak: number;
   lastAktif: string; // "YYYY-MM-DD"
   suaraOn: boolean;
+  volumeMusik?: number; // 0..100, default 70
+  volumeSfx?: number;   // 0..100, default 80
 }
 
 export interface Materi {

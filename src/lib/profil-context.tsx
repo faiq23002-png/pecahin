@@ -35,7 +35,12 @@ interface AppActions {
   beliItem: (itemId: string) => boolean;
   resetAll: () => void;
   toggleSuara: () => void;
+  setVolumeMusik: (vol: number) => void;
+  setVolumeSfx: (vol: number) => void;
   toggleModeJuri: () => void;
+  setKoinManual: (jumlah: number) => void;
+  setSemuaMateriSelesai: (selesai: boolean) => void;
+  setSemuaGameTerbuka: (terbuka: boolean) => void;
   catatTerakhirDibuka: (item: TerakhirDibuka) => void;
 }
 
@@ -77,7 +82,7 @@ export const useApp = create<AppStore>()((set, get) => {
     items: load<string[]>("items", []),
     modeJuri: false,
     poin: 0,
-    maskotLevel: 0,
+    maskotLevel: 1,
     terakhirDibuka: load<TerakhirDibuka | null>(KEYS.terakhirDibuka, null),
   };
 
@@ -225,8 +230,100 @@ export const useApp = create<AppStore>()((set, get) => {
     },
 
     toggleSuara: () => set((state) => ({ profil: state.profil ? { ...state.profil, suaraOn: !state.profil.suaraOn } : null })),
+
+    setVolumeMusik: (vol: number) => {
+      set((state) => ({
+        profil: state.profil ? { ...state.profil, volumeMusik: vol } : null,
+      }));
+    },
+
+    setVolumeSfx: (vol: number) => {
+      set((state) => ({
+        profil: state.profil ? { ...state.profil, volumeSfx: vol } : null,
+      }));
+    },
     
     toggleModeJuri: () => set((state) => ({ modeJuri: !state.modeJuri })),
+
+    setKoinManual: (jumlah: number) => {
+      set((state) => {
+        if (!state.profil) return state;
+        const targetKoin = Math.max(0, jumlah);
+        // Create synthetic history or adjust riwayat if needed to reflect poin, or set koin directly in profil
+        const spend = state.items.reduce((acc, itemId) => {
+          const item = ITEM_TOKO.find((i) => i.id === itemId);
+          return acc + (item ? item.hargaKoin : 0);
+        }, 0);
+        // We ensure riwayat has enough points to match desired koin
+        const desiredPoin = targetKoin + spend;
+        const currentPoin = totalPoin(state.riwayat, state.game);
+        let newRiwayat = [...state.riwayat];
+        if (desiredPoin > currentPoin) {
+          const diff = Math.min(30, desiredPoin - currentPoin);
+          SOAL.slice(0, diff).forEach((s) => {
+            if (!newRiwayat.some((r) => r.soalId === s.id && r.benar)) {
+              newRiwayat.push({
+                id: uid("demo"),
+                soalId: s.id,
+                benar: true,
+                domain: s.domain,
+                waktu: new Date().toISOString(),
+              });
+            }
+          });
+        }
+        const updatedProfil = { ...state.profil, koin: targetKoin };
+        const newState = { profil: updatedProfil, riwayat: newRiwayat };
+        return {
+          ...newState,
+          ...syncCalculatedFields({ ...state, ...newState }),
+          profil: updatedProfil, // explicitly maintain custom koin amount
+        };
+      });
+    },
+
+    setSemuaMateriSelesai: (selesai: boolean) => {
+      set((state) => {
+        const newProgress: Record<string, ProgressMateri> = {};
+        for (const m of MATERI) {
+          newProgress[m.id] = selesai
+            ? {
+                materiId: m.id,
+                tahapBelajar: "selesai",
+                tahapCoba: "selesai",
+                tahapLatihan: "selesai",
+                selesai: true,
+                percobaanLatihan: 1,
+              }
+            : {
+                materiId: m.id,
+                tahapBelajar: m.urutan === 1 ? "terbuka" : "terkunci",
+                tahapCoba: "terkunci",
+                tahapLatihan: "terkunci",
+                selesai: false,
+                percobaanLatihan: 0,
+              };
+        }
+        return { progress: newProgress };
+      });
+    },
+
+    setSemuaGameTerbuka: (terbuka: boolean) => {
+      set((state) => {
+        const newGame: Record<string, ProfilGame> = { ...state.game };
+        const t = todayStr();
+        ["g1", "g2", "g3", "gCampuran"].forEach((gid) => {
+          newGame[gid] = {
+            gameId: gid,
+            skorTerbaik: terbuka ? 10 : 0,
+            koinDihasilkan: terbuka ? 50 : 0,
+            terakhirMain: t,
+          };
+        });
+        const newState = { game: newGame };
+        return { ...newState, ...syncCalculatedFields({ ...state, ...newState }) };
+      });
+    },
 
     catatTerakhirDibuka: (item) => set({ terakhirDibuka: item }),
 
@@ -234,7 +331,7 @@ export const useApp = create<AppStore>()((set, get) => {
       Object.values(KEYS).forEach((k) => remove(k));
       remove("items");
       set({
-        profil: null, progress: {}, riwayat: [], game: {}, harian: {}, achievements: [], items: [], modeJuri: false, poin: 0, maskotLevel: 0, terakhirDibuka: null
+        profil: null, progress: {}, riwayat: [], game: {}, harian: {}, achievements: [], items: [], modeJuri: false, poin: 0, maskotLevel: 1, terakhirDibuka: null
       });
     }
   };

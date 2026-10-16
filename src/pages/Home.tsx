@@ -44,6 +44,39 @@ function Arrow({ className = "" }: { className?: string }) {
   );
 }
 
+/** Batang Kayu Penggulung Peta Kuno untuk Tema Treasure Scroll */
+function WoodenScrollRoller() {
+  return (
+    <div className="relative mx-auto flex w-full items-center justify-center select-none">
+      {/* Knop Kayu Kiri */}
+      <div className="h-5 w-3.5 shrink-0 rounded-l-md border-2 border-r-0 border-[#3e2412] bg-gradient-to-b from-[#d97706] via-[#92400e] to-[#451a03] shadow-md" />
+      {/* Cincin Emas Kiri */}
+      <div className="h-4.5 w-2 shrink-0 border-y-2 border-[#3e2412] bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-700" />
+      {/* Batang Utama Kayu Jati */}
+      <div className="h-3.5 flex-1 border-2 border-[#3e2412] bg-gradient-to-b from-[#b45309] via-[#78350f] to-[#451a03] shadow-[0_3px_5px_rgba(0,0,0,0.45)]" />
+      {/* Cincin Emas Kanan */}
+      <div className="h-4.5 w-2 shrink-0 border-y-2 border-[#3e2412] bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-700" />
+      {/* Knop Kayu Kanan */}
+      <div className="h-5 w-3.5 shrink-0 rounded-r-md border-2 border-l-0 border-[#3e2412] bg-gradient-to-b from-[#d97706] via-[#92400e] to-[#451a03] shadow-md" />
+    </div>
+  );
+}
+
+/** Ornamen Kompas Klasik SVG */
+function CompassRose({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} fill="none" aria-hidden>
+      <circle cx="32" cy="32" r="26" stroke="#78350f" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.45" />
+      <circle cx="32" cy="32" r="18" stroke="#78350f" strokeWidth="1.2" opacity="0.35" />
+      <polygon points="32,4 37,27 32,23 27,27" fill="#b91c1c" opacity="0.65" />
+      <polygon points="32,60 37,37 32,41 27,37" fill="#78350f" opacity="0.5" />
+      <polygon points="4,32 27,27 23,32 27,37" fill="#78350f" opacity="0.5" />
+      <polygon points="60,32 37,27 41,32 37,37" fill="#78350f" opacity="0.5" />
+      <circle cx="32" cy="32" r="3.5" fill="#78350f" />
+    </svg>
+  );
+}
+
 function SectionHead({ title, hint, action }: { title: string; hint?: string; action?: React.ReactNode }) {
   return (
     <div className="mb-3 flex items-end justify-between gap-3 px-0.5">
@@ -62,12 +95,33 @@ export default function Home() {
   const { navigate } = useRouter();
   const { profil, progress, harian, poin, maskotLevel, terakhirDibuka, game, riwayat, modeJuri } = useApp();
   const [toast, setToast] = useState<string | null>(null);
+  const [showMascotDialog, setShowMascotDialog] = useState(false);
+  const [isMascotMinimized, setIsMascotMinimized] = useState(() => {
+    try {
+      return localStorage.getItem("mpi_minimized") === "true";
+    } catch {
+      return false;
+    }
+  });
+  const [dialogIndex, setDialogIndex] = useState(0);
 
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 2200);
     return () => clearTimeout(t);
   }, [toast]);
+
+  // Lock body scroll when MPI dialog is open
+  useEffect(() => {
+    if (showMascotDialog) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showMascotDialog]);
 
   if (!profil) {
     return (
@@ -153,7 +207,7 @@ export default function Home() {
 
       {/* ================= GERBANG PASAR ATAP & JUDUL (FIXED TOP) ================= */}
       <div className="sticky top-0 z-30 w-full select-none">
-        <Awning tone="teal" height={32} stripe={22} light="#fef08a" />
+        <Awning tone="orange" height={32} stripe={22} light="#fef08a" />
         <div className="-mt-1.5 flex justify-center pb-1">
           <HangingSign rope={10} className="px-3 py-0.5">
             <img
@@ -174,7 +228,7 @@ export default function Home() {
             aria-label="Buka rumah maskot"
             className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl border-2 border-ink bg-amber-100 shadow-[0_3px_0_#1e293b] transition active:translate-y-[2px] active:shadow-[0_1px_0_#1e293b]"
           >
-            <Mascot gender={profil.gender} level={maskotLevel} size={46} />
+            <Mascot gender={profil.gender} level={maskotLevel} size={48} />
           </button>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-extrabold text-amber-200 [text-shadow:0_1px_2px_rgba(0,0,0,0.9)]">Pedagang cilik hari ini</p>
@@ -191,45 +245,68 @@ export default function Home() {
           </button>
         </header>
 
-        {/* ================= HERO: LAPAK YANG DILANJUTKAN ================= */}
-        <section className="overflow-hidden rounded-3xl border-2 border-ink bg-white" style={{ boxShadow: "0 5px 0 #1e293b" }}>
-          <Awning tone={heroTone} height={26} stripe={20} outline={false} />
+        {/* ================= HERO: GULUNGAN PETA HARTA SAUDAGAR (TREASURE SCROLL) ================= */}
+        <section className="relative my-2 select-none">
+          {/* Batang Kayu Penggulung Atas */}
+          <WoodenScrollRoller />
 
-          <div className={`relative ${TONE[heroTone].solid} px-4 pt-3 pb-4 text-white`}>
-            <div className="flex items-center gap-3">
-              <div className="min-w-0 flex-1">
-                <PriceTag color="amber">
-                  {heroIsGame ? "Terakhir dimainkan" : terakhirDibuka ? "Terakhir dibuka" : "Mulai dari sini"}
-                </PriceTag>
-                <h2 className="mt-2 font-display text-xl font-extrabold leading-tight">{hero.nama}</h2>
-                <p className="mt-0.5 text-sm font-semibold text-white/80">{hero.sub}</p>
-              </div>
-              {/* barang dagangan dipajang di atas piring */}
-              <div className="relative shrink-0">
-                <div className="grid h-24 w-24 place-items-center rounded-full border-2 border-ink bg-white p-3 shadow-[0_3px_0_#1e293b]">
-                  {!heroIsGame && OBJ[hero.id] ? (
-                    <FractionShape kind={OBJ[hero.id]} n={4} k={3} />
-                  ) : (
-                    <span className="text-5xl" aria-hidden>{hero.emoji}</span>
-                  )}
+          {/* Lembaran Perkamen Kuno Khas Peta Saudagar */}
+          <div
+            className="relative mx-1.5 border-x-4 border-[#5c3418] bg-[#f7e6c4] px-4 py-4 shadow-[inset_0_0_24px_rgba(146,64,14,0.3),0_8px_20px_rgba(0,0,0,0.35)]"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgba(120, 53, 15, 0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(217, 119, 6, 0.12), transparent 20%, transparent 80%, rgba(120, 53, 15, 0.2))",
+              backgroundSize: "16px 16px, 100% 100%",
+            }}
+          >
+            {/* Ornamen Kompas Mawar Transparan di Sudut Kertas */}
+            <CompassRose className="pointer-events-none absolute top-2 right-2 h-14 w-14" />
+
+            {/* Bingkai Jahitan Tinta Klasik Perkamen */}
+            <div className="rounded-2xl border-2 border-dashed border-[#92400e]/50 p-3.5 bg-[#fdf5e2]/60">
+              <div className="flex items-center gap-3">
+                <div className="min-w-0 flex-1">
+                  {/* Badge Segel Status Perkamen */}
+                  <div className="inline-flex items-center gap-1.5 rounded-md border border-[#451a03] bg-gradient-to-r from-amber-300 to-yellow-400 px-2.5 py-0.5 text-[10px] font-black uppercase text-[#451a03] shadow-xs">
+                    <span>🧭</span>
+                    <span>{heroIsGame ? "Panggung Permainan" : terakhirDibuka ? "Pos Terakhir Dibuka" : "Mulai Petualangan"}</span>
+                  </div>
+
+                  <h2 className="mt-2 font-display text-lg font-black leading-tight text-[#3e2412]">
+                    {hero.nama}
+                  </h2>
+                  <p className="mt-0.5 text-xs font-bold text-[#78350f]">{hero.sub}</p>
+                </div>
+
+                {/* Segel Medali Pajangan Objek Pecahan */}
+                <div className="relative shrink-0">
+                  <div className="grid h-20 w-20 place-items-center rounded-2xl border-2 border-[#451a03] bg-[#fffbeb] p-2.5 shadow-[0_3px_0_#451a03]">
+                    {!heroIsGame && OBJ[hero.id] ? (
+                      <FractionShape kind={OBJ[hero.id]} n={4} k={3} />
+                    ) : (
+                      <span className="text-4xl" aria-hidden>{hero.emoji}</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                sfx("pop");
-                navigate(hero.route);
-              }}
-              className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-2xl border-2 border-ink bg-white py-3 font-display text-base font-extrabold text-ink transition active:translate-y-[3px]"
-              style={{ boxShadow: `0 4px 0 ${heroShadow}` }}
-            >
-              {heroIsGame ? "Buka lapak lagi" : "Lanjut belajar"}
-              <Arrow />
-            </button>
+              {/* Tombol Aksi Khas Ekspedisi Peta Harta */}
+              <button
+                type="button"
+                onClick={() => {
+                  sfx("pop");
+                  navigate(hero.route);
+                }}
+                className="mt-3.5 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#451a03] bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 py-3 font-display text-sm font-black text-[#451a03] shadow-[0_4px_0_#451a03] transition active:translate-y-[2px] active:shadow-[0_2px_0_#451a03]"
+              >
+                <span>{heroIsGame ? "🎪 Buka Lapak Permainan" : "🧭 Lanjutkan Ekspedisi"}</span>
+                <Arrow />
+              </button>
+            </div>
           </div>
-          <Counter />
+
+          {/* Batang Kayu Penggulung Bawah */}
+          <WoodenScrollRoller />
         </section>
 
         {/* ================= PROGRES ================= */}
@@ -237,42 +314,58 @@ export default function Home() {
           <SectionHead title="Buku Catatan Lapak" hint={`${soalHariIni} transaksi soal hari ini`} />
 
           <div
-            className="overflow-hidden rounded-3xl border-2 border-ink bg-amber-50/70"
-            style={{ boxShadow: "0 5px 0 #1e293b" }}
+            className="overflow-hidden rounded-3xl border-2 border-[#451a03] bg-[#fbf4e2] shadow-[0_5px_0_#451a03]"
           >
-            {/* Atap kanopi stan info pasar */}
-            <Awning tone="orange" height={22} stripe={16} light="#fef08a" outline={false} />
+            {/* Header Jurnal Ekspedisi Vintage */}
+            <div className="flex items-center justify-between border-b-2 border-[#451a03] bg-gradient-to-r from-[#78350f] via-[#92400e] to-[#78350f] px-4 py-2.5 text-[#fef3c7] shadow-inner">
+              <div className="flex items-center gap-2">
+                <span className="text-lg" aria-hidden>📜</span>
+                <span className="font-display text-xs font-black uppercase tracking-wider text-[#fef3c7] [text-shadow:0_1px_1px_rgba(0,0,0,0.6)]">
+                  Jurnal Ekspedisi Saudagar
+                </span>
+              </div>
+              <span className="rounded-full border border-amber-400/40 bg-amber-950/40 px-2 py-0.5 text-[10px] font-black text-amber-200">
+                Catatan Harian
+              </span>
+            </div>
 
             {/* Papan atas: Timbangan / Neraca Poin Pasar */}
-            <div className="bg-white/95 p-4 border-b-2 border-dashed border-amber-300">
-              <div className="flex items-center gap-4">
+            <div className="relative overflow-hidden border-b-2 border-dashed border-[#b45309]/30 bg-gradient-to-b from-[#fffefc] to-[#fbf4e2] p-4">
+              {/* Faded compass watermark */}
+              <div className="pointer-events-none absolute -right-6 -bottom-6 opacity-10">
+                <CompassRose className="h-32 w-32" />
+              </div>
+
+              <div className="relative z-10 flex items-center gap-4">
                 {/* Meteran Neraca / Timbangan Pasar */}
-                <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-2xl border-2 border-ink bg-amber-100 shadow-[0_3px_0_#1e293b]">
+                <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-2xl border-2 border-[#78350f] bg-gradient-to-b from-amber-100 to-amber-200 shadow-[0_3px_0_#451a03]">
                   <svg viewBox="0 0 36 36" className="absolute inset-2 -rotate-90" aria-hidden>
-                    <circle cx="18" cy="18" r="14" fill="none" stroke="#fed7aa" strokeWidth="3.5" />
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#fcd34d" strokeWidth="3.5" opacity="0.4" />
                     <circle
-                      cx="18" cy="18" r="14" fill="none" stroke="#f97316" strokeWidth="3.5" strokeLinecap="round"
+                      cx="18" cy="18" r="14" fill="none" stroke="#b45309" strokeWidth="3.5" strokeLinecap="round"
                       strokeDasharray={`${(poin / 100) * 88} 88`}
                       className="transition-all duration-700"
                     />
                   </svg>
                   <div className="text-center leading-none z-10">
-                    <span className="text-[10px] block font-extrabold text-amber-800 uppercase tracking-tighter">Hasil</span>
-                    <div className="font-display text-2xl font-extrabold tabular-nums text-ink">{poin}</div>
-                    <div className="text-[9px] font-black text-amber-900/60">/ 100</div>
+                    <span className="text-[9px] block font-extrabold text-[#78350f] uppercase tracking-tighter">Hasil</span>
+                    <div className="font-display text-2xl font-black tabular-nums text-[#451a03]">{poin}</div>
+                    <div className="text-[9px] font-black text-[#92400e]/80">/ 100</div>
                   </div>
                 </div>
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <span className="text-base" aria-hidden>⚖️</span>
-                    <span className="font-display text-base font-extrabold text-ink">{stageNow.nama}</span>
-                    <PriceTag color="amber" className="ml-auto text-[10px]">Peringkat</PriceTag>
+                    <span className="font-display text-base font-extrabold text-[#451a03]">{stageNow.nama}</span>
+                    <span className="ml-auto rounded-lg border border-[#b45309]/60 bg-amber-200/80 px-2 py-0.5 text-[10px] font-black text-[#78350f] shadow-xs">
+                      Peringkat
+                    </span>
                   </div>
-                  <p className="mt-1 text-xs font-semibold leading-snug text-muted">
+                  <p className="mt-1 text-xs font-semibold leading-snug text-[#78350f]/85">
                     {stageNext ? (
                       <>
-                        <b className="text-orange-600 font-extrabold">{stageNext.ambangBintang - poin} poin lagi</b> untuk naik pangkat ke <b>{stageNext.nama}</b>
+                        <b className="text-[#b45309] font-black">{stageNext.ambangBintang - poin} poin lagi</b> untuk naik pangkat ke <b>{stageNext.nama}</b>
                       </>
                     ) : (
                       "🏆 Saudagar Legendaris! Pangkat tertinggi tercapai."
@@ -281,13 +374,13 @@ export default function Home() {
                   
                   {/* Badge Rekap Hasil Pasar */}
                   <div className="mt-2.5 flex flex-wrap gap-2 text-[11px] font-bold">
-                    <span className="inline-flex items-center gap-1 rounded-lg border border-teal-300 bg-teal-50 px-2 py-0.5 text-teal-800 shadow-xs">
+                    <span className="inline-flex items-center gap-1 rounded-lg border border-[#b45309]/30 bg-[#fef8ea] px-2 py-0.5 text-[#78350f] shadow-xs">
                       <span>🍉 Lapak:</span>
-                      <b className="tabular-nums text-teal-900 font-extrabold">{poinMateriTotal}/{POIN_LATIHAN_MAX}</b>
+                      <b className="tabular-nums text-[#451a03] font-black">{poinMateriTotal}/{POIN_LATIHAN_MAX}</b>
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-lg border border-orange-300 bg-orange-50 px-2 py-0.5 text-orange-800 shadow-xs">
+                    <span className="inline-flex items-center gap-1 rounded-lg border border-[#b45309]/30 bg-[#fef8ea] px-2 py-0.5 text-[#78350f] shadow-xs">
                       <span>🎪 Game:</span>
-                      <b className="tabular-nums text-orange-900 font-extrabold">{poinGameTotal}/70</b>
+                      <b className="tabular-nums text-[#451a03] font-black">{poinGameTotal}/70</b>
                     </span>
                   </div>
                 </div>
@@ -295,32 +388,32 @@ export default function Home() {
             </div>
 
             {/* Rincian per lapak pasar */}
-            <div className="p-4 bg-white/70">
+            <div className="p-4 bg-[#faf2de]/75">
               <div className="mb-2.5 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-700">
-                  <span>🏪</span> Dagangan Tiap Lapak
+                <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[#78350f]">
+                  <span>🗺️</span> Rute Penjelajahan Lapak
                 </span>
-                <span className="text-[10px] font-bold text-muted">Skor Latihan</span>
+                <span className="text-[10px] font-bold text-[#92400e]/80">Skor Latihan</span>
               </div>
               <ul className="space-y-2">
                 {materiRows.map((m) => (
                   <li
                     key={m.id}
-                    className="flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white p-2.5 shadow-xs transition hover:border-amber-300"
+                    className="flex items-center gap-3 rounded-2xl border-2 border-[#b45309]/25 bg-[#fffdfa] p-2.5 shadow-xs transition hover:border-[#b45309]"
                   >
                     <Crate size={40} className="shrink-0">
                       {LAPAK_EMOJI[m.id]}
                     </Crate>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-2">
-                        <span className="truncate text-xs font-extrabold text-ink">{LAPAK_SHORT[m.id] ?? m.judul}</span>
+                        <span className="truncate text-xs font-extrabold text-[#451a03]">{LAPAK_SHORT[m.id] ?? m.judul}</span>
                         <span className="shrink-0 text-[11px] font-extrabold tabular-nums">
                           {m.terkunci ? (
-                            <span className="inline-flex items-center gap-1 text-slate-400 font-bold">
+                            <span className="inline-flex items-center gap-1 text-stone-400 font-bold">
                               <IconLock size={11} /> Tutup
                             </span>
                           ) : (
-                            <span className="text-teal-700 font-black">{m.poin}/{m.total} poin</span>
+                            <span className="text-[#92400e] font-black">{m.poin}/{m.total} poin</span>
                           )}
                         </span>
                       </div>
@@ -333,12 +426,12 @@ export default function Home() {
               </ul>
 
               {/* Rincian stan game festival pasar */}
-              <div className="mt-4 pt-3 border-t-2 border-dashed border-amber-200">
+              <div className="mt-4 pt-3 border-t-2 border-dashed border-[#b45309]/25">
                 <div className="mb-2.5 flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-700">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[#78350f]">
                     <span>🎪</span> Stan Game Pasar
                   </span>
-                  <span className="text-[10px] font-bold text-muted">Rekor Terbaik</span>
+                  <span className="text-[10px] font-bold text-[#92400e]/80">Rekor Terbaik</span>
                 </div>
                 <ul className="space-y-2">
                   {gameCards.map((g) => {
@@ -347,24 +440,24 @@ export default function Home() {
                     return (
                       <li
                         key={g.id}
-                        className="flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white p-2.5 shadow-xs transition hover:border-orange-300"
+                        className="flex items-center gap-3 rounded-2xl border-2 border-[#b45309]/25 bg-[#fffdfa] p-2.5 shadow-xs transition hover:border-[#b45309]"
                       >
                         <div
-                          className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-ink ${TONE[g.tone].soft} text-lg shadow-[0_2px_0_#1e293b]`}
+                          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-[#78350f] bg-gradient-to-b from-amber-100 to-amber-200 text-lg shadow-[0_2px_0_#451a03]"
                           aria-hidden
                         >
-                          {g.terkunci ? <IconLock size={15} className="text-slate-400" /> : g.emoji}
+                          {g.terkunci ? <IconLock size={15} className="text-stone-400" /> : g.emoji}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-baseline justify-between gap-2">
-                            <span className="truncate text-xs font-extrabold text-ink">{g.nama}</span>
+                            <span className="truncate text-xs font-extrabold text-[#451a03]">{g.nama}</span>
                             <span className="shrink-0 text-[11px] font-extrabold tabular-nums">
                               {g.terkunci ? (
-                                <span className="inline-flex items-center gap-1 text-slate-400 font-bold">
+                                <span className="inline-flex items-center gap-1 text-stone-400 font-bold">
                                   <IconLock size={11} /> Belum Buka
                                 </span>
                               ) : (
-                                <span className="text-orange-600 font-black">{didapat}/{max} poin</span>
+                                <span className="text-[#b45309] font-black">{didapat}/{max} poin</span>
                               )}
                             </span>
                           </div>
@@ -379,8 +472,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Meja kayu konter stan di bagian bawah */}
-            <Counter />
+            {/* Garis pinggir bawah kayu ekspedisi */}
+            <div className="h-3 w-full border-t-2 border-[#3e2412] bg-gradient-to-r from-[#78350f] via-[#b45309] to-[#78350f]" />
           </div>
         </section>
 
@@ -393,9 +486,9 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => navigate("materi")}
-                className="flex items-center gap-0.5 rounded-full border border-teal-400 bg-teal-800/80 px-2.5 py-1 text-xs font-black text-white shadow-xs backdrop-blur-xs transition active:scale-95"
+                className="flex items-center gap-1 rounded-full border border-amber-500/80 bg-gradient-to-r from-[#78350f] to-[#92400e] px-3 py-1 text-xs font-black text-amber-200 shadow-md backdrop-blur-xs transition active:scale-95"
               >
-                Peta <Arrow className="-mr-0.5" />
+                <span>🗺️ Peta</span> <Arrow className="-mr-0.5" />
               </button>
             }
           />
@@ -409,37 +502,89 @@ export default function Home() {
                   sfx("pop");
                   navigate(`materi${m.urutan}`);
                 }}
-                className={`relative block w-full overflow-hidden rounded-2xl border-2 text-left transition active:translate-y-[2px] ${
+                className={`group relative block w-full overflow-hidden rounded-2xl border-2 text-left transition active:translate-y-[2px] ${
                   m.terkunci
-                    ? "border-slate-400 bg-white shadow-[0_3px_0_#94a3b8]"
-                    : "border-ink bg-white shadow-[0_3px_0_#1e293b] active:shadow-[0_1px_0_#1e293b]"
+                    ? "border-stone-400/80 bg-stone-100 shadow-[0_3px_0_#78716c]"
+                    : "border-[#451a03] bg-gradient-to-r from-[#fffdfa] via-[#fdf6e6] to-[#faf0d9] shadow-[0_4px_0_#451a03] active:shadow-[0_1px_0_#451a03]"
                 }`}
               >
-                <Awning tone={m.terkunci ? "slate" : m.tone} height={14} stripe={14} outline={false} />
-                <div className="flex items-center gap-3 px-3 pt-1.5 pb-3">
-                  <Crate size={52} className={m.terkunci ? "opacity-70 grayscale" : ""}>
-                    {LAPAK_EMOJI[m.id]}
-                  </Crate>
+                {/* List Atas Emas Vintage */}
+                <div
+                  className={`h-1.5 w-full ${
+                    m.terkunci
+                      ? "bg-stone-300"
+                      : "bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600"
+                  }`}
+                />
+
+                <div className="relative flex items-center gap-3 px-3.5 py-3">
+                  {/* Watermark kompas pudar */}
+                  {!m.terkunci && (
+                    <div className="pointer-events-none absolute right-14 -bottom-4 opacity-5">
+                      <CompassRose className="h-24 w-24" />
+                    </div>
+                  )}
+
+                  {/* Stamp peti dagangan dengan wax seal nomor */}
+                  <div className="relative shrink-0">
+                    <Crate size={50} className={m.terkunci ? "opacity-60 grayscale" : "shadow-xs"}>
+                      {LAPAK_EMOJI[m.id]}
+                    </Crate>
+                    <span className="absolute -top-1.5 -left-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-[#451a03] bg-amber-400 font-display text-[10px] font-black text-[#451a03] shadow-xs">
+                      {m.urutan}
+                    </span>
+                  </div>
+
                   <div className="min-w-0 flex-1">
-                    <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Lapak {m.urutan}</div>
-                    <div className={`truncate font-display text-base font-extrabold leading-tight ${m.terkunci ? "text-slate-700" : "text-ink"}`}>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-[10px] font-black uppercase tracking-wider ${m.terkunci ? "text-stone-500" : "text-[#92400e]"}`}>
+                        Lapak {m.urutan} • Jalur Ekspedisi
+                      </span>
+                    </div>
+                    <div className={`truncate font-display text-base font-black leading-tight ${m.terkunci ? "text-stone-600" : "text-[#451a03]"}`}>
                       {m.judul}
                     </div>
-                    {/* indikator 3 tahap */}
-                    <div className="mt-1.5 flex gap-1" aria-label={`${m.tahapSelesai} dari 3 tahap selesai`}>
-                      {[0, 1, 2].map((i) => (
-                        <span key={i} className={`h-1.5 w-6 rounded-full ${i < m.tahapSelesai ? TONE[m.tone].bar : "bg-slate-200"}`} />
-                      ))}
+
+                    {/* 3 Tahap Indikator Ekspedisi */}
+                    <div className="mt-2 flex items-center gap-1.5">
+                      {[0, 1, 2].map((i) => {
+                        const done = i < m.tahapSelesai;
+                        const label = i === 0 ? "Belajar" : i === 1 ? "Coba" : "Latihan";
+                        return (
+                          <span
+                            key={i}
+                            className={`inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[9px] font-black ${
+                              done
+                                ? "border border-amber-600/40 bg-amber-400/30 text-[#451a03]"
+                                : m.terkunci
+                                ? "border border-stone-300 bg-stone-200/50 text-stone-400"
+                                : "border border-stone-300/80 bg-white/70 text-stone-400"
+                            }`}
+                          >
+                            <span>{done ? "✓" : "○"}</span>
+                            <span>{label}</span>
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
+
+                  {/* Status Badge di Ujung Kanan */}
                   {m.selesai ? (
-                    <PriceTag color="green" className="shrink-0">Lulus</PriceTag>
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-emerald-700 bg-emerald-600 px-2.5 py-1 text-xs font-black text-white shadow-xs">
+                      <span>✓</span> Lulus
+                    </span>
                   ) : m.terkunci ? (
-                    <IconLock size={18} className="shrink-0 text-slate-400" />
+                    <div className="shrink-0 rounded-xl border border-stone-300 bg-stone-200/70 p-2 text-stone-500">
+                      <IconLock size={16} />
+                    </div>
                   ) : (
-                    <Arrow className="shrink-0 text-slate-400" />
+                    <div className="shrink-0 rounded-xl border-2 border-[#451a03] bg-gradient-to-b from-amber-300 to-amber-400 p-2 text-[#451a03] shadow-[0_2px_0_#451a03] transition group-hover:translate-x-0.5">
+                      <Arrow className="text-[#451a03]" />
+                    </div>
                   )}
                 </div>
+
                 {m.terkunci && <ClosedSign className="absolute top-2 right-10" />}
               </button>
             ))}
@@ -456,9 +601,9 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => navigate("game")}
-                className="flex items-center gap-0.5 rounded-full border border-orange-400 bg-orange-700/80 px-2.5 py-1 text-xs font-black text-white shadow-xs backdrop-blur-xs transition active:scale-95"
+                className="flex items-center gap-1 rounded-full border border-amber-500/80 bg-gradient-to-r from-[#78350f] to-[#92400e] px-3 py-1 text-xs font-black text-amber-200 shadow-md backdrop-blur-xs transition active:scale-95"
               >
-                Semua <Arrow className="-mr-0.5" />
+                <span>🎪 Semua</span> <Arrow className="-mr-0.5" />
               </button>
             }
           />
@@ -474,38 +619,44 @@ export default function Home() {
                 }}
                 className={`relative flex flex-col overflow-hidden rounded-2xl border-2 text-left transition active:translate-y-[2px] ${
                   g.terkunci
-                    ? "border-slate-400 bg-white shadow-[0_3px_0_#94a3b8]"
-                    : "border-ink bg-white shadow-[0_3px_0_#1e293b] active:shadow-[0_1px_0_#1e293b]"
+                    ? "border-stone-400 bg-stone-100/95 shadow-[0_3px_0_#78716c]"
+                    : "border-[#451a03] bg-gradient-to-b from-[#fffefc] via-[#fbf3e0] to-[#f6ebd1] shadow-[0_4px_0_#451a03] active:shadow-[0_1px_0_#451a03]"
                 }`}
               >
-                <Awning tone={g.terkunci ? "slate" : g.tone} height={20} stripe={16} outline={false} />
-                <div className="flex flex-1 flex-col px-3 pt-2 pb-3">
+                {/* List Batang Kayu Atas */}
+                <div className="h-2 w-full border-b border-[#451a03] bg-gradient-to-r from-[#78350f] via-[#b45309] to-[#78350f]" />
+
+                <div className="flex flex-1 flex-col p-3">
                   <div className="flex items-start justify-between">
                     <span
-                      className={`grid h-12 w-12 place-items-center rounded-full border-2 ${
-                        g.terkunci ? "border-slate-300 bg-slate-50" : "border-ink bg-white shadow-[0_2px_0_#1e293b]"
+                      className={`grid h-11 w-11 place-items-center rounded-xl border-2 ${
+                        g.terkunci
+                          ? "border-stone-300 bg-stone-200"
+                          : "border-[#451a03] bg-gradient-to-b from-amber-100 to-amber-200 shadow-[0_2px_0_#451a03]"
                       }`}
                     >
                       <span className="text-2xl" aria-hidden>{g.emoji}</span>
                     </span>
                     {!g.terkunci && g.skor > 0 ? (
-                      <PriceTag color="amber" className="tabular-nums">
+                      <span className="rounded-lg border border-[#b45309] bg-amber-200/90 px-1.5 py-0.5 text-[11px] font-black text-[#78350f] tabular-nums shadow-xs">
                         {g.skor}/{GAME_ROUNDS}
-                      </PriceTag>
+                      </span>
                     ) : g.terkunci ? (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-slate-100 px-2 py-0.5 text-[10px] font-black text-slate-600">
-                        <IconLock size={11} /> Terkunci
+                      <span className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-stone-200 px-1.5 py-0.5 text-[10px] font-black text-stone-600">
+                        <IconLock size={11} /> Kunci
                       </span>
                     ) : null}
                   </div>
-                  <div className={`mt-2.5 font-display text-sm font-extrabold leading-tight ${g.terkunci ? "text-slate-700" : "text-ink"}`}>
+                  <div className={`mt-2 font-display text-sm font-black leading-tight ${g.terkunci ? "text-stone-600" : "text-[#451a03]"}`}>
                     {g.nama}
                   </div>
-                  <div className="mt-0.5 text-[11px] font-bold leading-snug text-slate-500">
+                  <div className={`mt-1 text-[11px] font-bold leading-snug line-clamp-2 ${g.terkunci ? "text-stone-500" : "text-[#78350f]/80"}`}>
                     {g.terkunci ? g.syarat : g.desc}
                   </div>
                 </div>
-                <Counter className={g.terkunci ? "opacity-75 grayscale" : ""} />
+
+                {/* List Kayu Bawah */}
+                <div className="h-1.5 w-full border-t border-[#451a03]/30 bg-[#78350f]/15" />
                 {g.terkunci && <ClosedSign className="absolute top-3 right-2" />}
               </button>
             ))}
@@ -521,6 +672,162 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Overlay Hitam Tipis saat Dialog Maskot Dibuka */}
+      {showMascotDialog && (
+        <div
+          onClick={() => {
+            sfx("tap");
+            setShowMascotDialog(false);
+          }}
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[1.5px] transition-opacity duration-300 pointer-events-auto"
+          aria-hidden
+        />
+      )}
+
+      {/* ================= FLOATING MASKOT PENDAMPING (KANAN BAWAH) ================= */}
+      <div className={`fixed bottom-20 z-50 select-none pointer-events-auto ${isMascotMinimized ? "right-0" : "right-3"}`}>
+        {isMascotMinimized ? (
+          /* Tombol Panah < Nempel di Pojok Kanan Layar Tanpa Celah */
+          <button
+            type="button"
+            onClick={() => {
+              sfx("pop");
+              setIsMascotMinimized(false);
+              try {
+                localStorage.setItem("mpi_minimized", "false");
+              } catch {}
+            }}
+            aria-label="Tampilkan Maskot"
+            className="flex items-center gap-2 rounded-l-2xl border-2 border-r-0 border-ink bg-amber-400 pl-3.5 pr-2 py-2 text-ink shadow-[-4px_4px_12px_rgba(0,0,0,0.25)] transition active:scale-95 hover:bg-amber-300"
+          >
+            <span className="text-base font-black text-amber-950 animate-pulse">◀</span>
+            <div className="h-8 w-8 rounded-full bg-white p-0.5 border-2 border-ink shadow-xs">
+              <Mascot gender={profil.gender} level={maskotLevel} size={28} />
+            </div>
+          </button>
+        ) : (
+          <div className="relative flex flex-col items-end">
+            {/* Pop-up Rangkuman Materi & Semangat Belajar */}
+            {showMascotDialog && (
+              <div className="mb-2 w-72 max-w-[85vw] rounded-3xl border-2 border-ink bg-white p-4 shadow-[0_8px_20px_rgba(0,0,0,0.25)] animate-pop">
+                <div className="flex items-center justify-between border-b border-amber-200 pb-2 mb-2.5">
+                  <span className="inline-flex items-center gap-1 text-xs font-black text-amber-800">
+                    <span>💡</span> Tips {profil.gender === "cowo" ? "Peco" : "Pica"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sfx("tap");
+                      setShowMascotDialog(false);
+                    }}
+                    aria-label="Tutup pesan"
+                    className="h-6 w-6 rounded-full bg-slate-100 grid place-items-center text-xs font-extrabold text-slate-500 hover:bg-slate-200"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Konten Edukatif & Rangkuman Materi */}
+                <div className="text-xs font-bold text-ink leading-relaxed">
+                  {dialogIndex % 4 === 0 && (
+                    <>
+                      <p className="text-teal-700 font-extrabold mb-1">🍉 Rangkuman Lapak 1:</p>
+                      <p className="text-slate-700 font-semibold">
+                        Pecahan itu harus <b>dibagi sama besar</b>! Angka di atas disebut <b>Pembilang</b> (bagian yang diambil), dan di bawah disebut <b>Penyebut</b> (total semua potongan).
+                      </p>
+                    </>
+                  )}
+                  {dialogIndex % 4 === 1 && (
+                    <>
+                      <p className="text-orange-600 font-extrabold mb-1">🍰 Rahasia Lapak 2:</p>
+                      <p className="text-slate-700 font-semibold">
+                        Makin besar penyebutnya, potongan kuenya makin <b>kecil</b> loh! Misalnya <b>1/4 potong</b> lebih besar daripada <b>1/8 potong</b>.
+                      </p>
+                    </>
+                  )}
+                  {dialogIndex % 4 === 2 && (
+                    <>
+                      <p className="text-violet-700 font-extrabold mb-1">🧺 Aturan Tambah Porsi:</p>
+                      <p className="text-slate-700 font-semibold">
+                        Saat menjumlahkan pecahan yang penyebutnya sama, cukup jumlahkan <b>angka atasnya</b> saja! Ukuran potongannya tidak bertambah.
+                      </p>
+                    </>
+                  )}
+                  {dialogIndex % 4 === 3 && (
+                    <>
+                      <p className="text-amber-700 font-extrabold mb-1">🔥 Semangat Saudagar Cilik:</p>
+                      <p className="text-slate-700 font-semibold">
+                        Hebat banget, {profil.nama}! Kamu sudah mengumpulkan <b>{poin} poin</b>. Terus berlatih agar maskotmu berevolusi ke pangkat tertinggi!
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100">
+                  <span className="text-[10px] font-bold text-muted">
+                    {dialogIndex % 4 + 1} dari 4 tips
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sfx("pop");
+                      setDialogIndex((prev) => prev + 1);
+                    }}
+                    className="text-[11px] font-black text-orange-600 hover:text-orange-700 flex items-center gap-1"
+                  >
+                    <span>Tips Lain</span> <span>›</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Karakter Maskot Interaktif + Tombol Tutup X Geser Kanan */}
+            <div className="relative flex items-end">
+              {/* Tombol X (Tutup / Geser ke kanan) */}
+              <button
+                type="button"
+                onClick={() => {
+                  sfx("tap");
+                  setShowMascotDialog(false);
+                  setIsMascotMinimized(true);
+                  try {
+                    localStorage.setItem("mpi_minimized", "true");
+                  } catch {}
+                }}
+                aria-label="Sembunyikan Maskot ke Kanan"
+                title="Sembunyikan Maskot"
+                className="absolute -top-1.5 -left-1.5 z-10 grid h-6 w-6 place-items-center rounded-full border border-ink bg-white text-xs font-black text-slate-600 shadow-md hover:bg-red-50 hover:text-red-600 active:scale-90"
+              >
+                ✕
+              </button>
+
+              {/* Maskot Tanpa Background Bulat (Langsung Karakter Berdiri) */}
+              <button
+                type="button"
+                onClick={() => {
+                  sfx("pop");
+                  setShowMascotDialog((prev) => !prev);
+                  if (!showMascotDialog) {
+                    setDialogIndex((prev) => prev + 1);
+                  }
+                }}
+                aria-label="Bicara dengan maskot"
+                className="relative flex items-end justify-center transition-transform active:scale-95 hover:scale-105"
+              >
+                <Mascot gender={profil.gender} level={maskotLevel} size={76} />
+                
+                {/* Bubble Icon Chat Kecil */}
+                {!showMascotDialog && (
+                  <span className="absolute top-1 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-ink bg-orange-500 text-xs font-bold text-white shadow-md animate-bounce">
+                    💬
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <BottomNav />
     </div>

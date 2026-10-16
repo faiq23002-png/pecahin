@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Perkembangan Belajar — PECAH-IN</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.4;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .no-print-toolbar {
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid #cbd5e1;
+      border-radius: 50px;
+      padding: 8px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 210mm;
+    }
+
+    .toolbar-info {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-download-pdf {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #ffffff;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-download-pdf:active {
+      transform: translateY(1px);
+    }
+
+    .page {
+      background: #ffffff;
+      width: 100%;
+      max-width: 210mm;
+      min-height: auto;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 640px) {
+      .page {
+        padding: 12mm 15mm;
+        min-height: 297mm;
+        border-radius: 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+    }
+
+    .pdf-header {
+      border-bottom: 2.5px solid #f97316;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pdf-header .mascot-icon {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .pdf-header h1 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.2px;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+
+    .pdf-header p {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .profile-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .profile-card {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    .profile-item {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .profile-item b {
+      display: block;
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .stat-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .stat-box .num {
+      font-size: 18px;
+      font-weight: 900;
+      color: #ea580c;
+      line-height: 1.2;
+    }
+
+    .stat-box .lbl {
+      font-size: 9px;
+      font-weight: 700;
+      color: #7c2d12;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    h2 {
+      font-size: 12.5px;
+      color: #0f172a;
+      border-left: 4px solid #f97316;
+      padding-left: 8px;
+      margin: 12px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    h3 {
+      font-size: 10.5px;
+      color: #334155;
+      font-weight: 700;
+      margin: 10px 0 6px;
+    }
+
+    .overall-card {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      background: #e2e8f0;
+      height: 9px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #f97316 0%, #fb923c 100%);
+      height: 100%;
+      border-radius: 5px;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+    }
+
+    table th {
+      background: #f97316;
+      color: #ffffff;
+      padding: 5px 8px;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    table td {
+      padding: 5px 8px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    table tr:nth-child(even) td {
+      background: #fffaf5;
+    }
+
+    .grid-two-col {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .grid-two-col {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .col-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .badge-list {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .badge-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 2.5px 8px;
+      border-radius: 6px;
+      font-size: 9.5px;
+      font-weight: 700;
+    }
+
+    .fokus-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      font-size: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .fokus-box p {
+      color: #9a3412;
+      line-height: 1.4;
+    }
+
+    .validation-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+    }
+
+    .page-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8.5px;
+      color: #94a3b8;
+      margin-top: 8px;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm;
+      }
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+      }
+      .no-print-toolbar {
+        display: none !important;
+      }
+      .page {
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        border-radius: 0 !important;
+      }
+      tr, table, .stat-box, .col-box {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print-toolbar">
+    <div class="toolbar-info">
+      <span>📄</span>
+      <span>Pratinjau Output PDF Rapor PECAH-IN</span>
+    </div>
+    <button class="btn-download-pdf" onclick="window.print()">
+      <span>⬇️</span>
+      <span>Simpan PDF</span>
+    </button>
+  </div>
+
+  <div class="page" id="halaman-rapor">
+    <div class="pdf-header">
+      <div class="mascot-icon">🍉</div>
+      <div>
+        <h1>LAPORAN PERKEMBANGAN BELAJAR MATEMATIKA — PECAHAN</h1>
+        <p>PECAH-IN — Petualangan Pecahan di Pasar Tradisional Ramah Anak (Fase B / Kelas 3–4 SD)</p>
+      </div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-item">Nama Pedagang Cilik:<b id="txt-child-name">Ahmad Fatih</b></div>
+      <div class="profile-item">Aktivitas:<b id="txt-study-days">🔥 5 Hari Streak</b></div>
+      <div class="profile-item">Pangkat Pasar:<b id="txt-stars">⭐ 65/100 (Ahli Pecahan)</b></div>
+      <div class="profile-item">Tanggal Cetak:<b id="txt-print-date">16 Oktober 2026</b></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="num" id="stat-total-poin">65/100</div>
+        <div class="lbl">Total Poin Pasar</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="stat-latihan">22/30</div>
+        <div class="lbl">Skor Ayo Latihan</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="stat-game">43/70</div>
+        <div class="lbl">Skor Stan Game</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="stat-souvenir">6 Item</div>
+        <div class="lbl">Koleksi Souvenir</div>
+      </div>
+    </div>
+
+    <h2>Capaian &amp; Penguasaan Konsep Pecahan Siswa</h2>
+
+    <div class="overall-card">
+      <div style="font-size:10.5px;font-weight:700;color:#1e293b;white-space:nowrap">Overall:</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="overall-bar" style="width: 65%;"></div>
+      </div>
+      <div style="font-size:10.5px;font-weight:700;color:#f97316;white-space:nowrap" id="overall-text">65% (Ahli Pecahan)</div>
+    </div>
+
+    <h3>A1. Capaian Penguasaan Per Lapak Materi (Fase B Kelas 3–4)</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:34%">Lapak Materi</th>
+            <th style="width:26%">Progress Latihan</th>
+            <th style="width:22%;text-align:center">Poin / Soal</th>
+            <th style="text-align:center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="table-modules-body">
+          <tr>
+            <td>🍉 Lapak 1: Kenal Pecahan &amp; Bagi Rata</td>
+            <td>
+              <div style="background:#e2e8f0;height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:#f97316;height:100%;width:90%"></div>
+              </div>
+            </td>
+            <td style="text-align:center"><b>9</b> / 10 soal (90%)</td>
+            <td style="text-align:center"><span style="background:#dcfce7;color:#166534;padding:1.5px 6px;border-radius:8px;font-weight:700;font-size:8.5px">Selesai</span></td>
+          </tr>
+          <tr>
+            <td>🍰 Lapak 2: Banding, Urut &amp; Senilai</td>
+            <td>
+              <div style="background:#e2e8f0;height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:#f97316;height:100%;width:70%"></div>
+              </div>
+            </td>
+            <td style="text-align:center"><b>7</b> / 10 soal (70%)</td>
+            <td style="text-align:center"><span style="background:#dcfce7;color:#166534;padding:1.5px 6px;border-radius:8px;font-weight:700;font-size:8.5px">Selesai</span></td>
+          </tr>
+          <tr>
+            <td>🧺 Lapak 3: Jumlahkan &amp; Cerita Pasar</td>
+            <td>
+              <div style="background:#e2e8f0;height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:#f97316;height:100%;width:60%"></div>
+              </div>
+            </td>
+            <td style="text-align:center"><b>6</b> / 10 soal (60%)</td>
+            <td style="text-align:center"><span style="background:#f1f5f9;color:#475569;padding:1.5px 6px;border-radius:8px;font-weight:700;font-size:8.5px">Sedang Belajar</span></td>
+          </tr>
+          <tr style="font-weight:700;background:#fff7ed">
+            <td colSpan={2}>Total Akumulasi Latihan</td>
+            <td style="text-align:center;color:#ea580c">22 / 30 Soal</td>
+            <td style="text-align:center">73% Penguasaan</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>A2. Diagnosis 3 Domain Kompetensi &amp; Stan Game Pasar</h3>
+    <div class="grid-two-col">
+      <div class="col-box">
+        <div style="font-size:10px;font-weight:700;margin-bottom:6px">🎯 Penguasaan Domain Kognitif:</div>
+        <div style="font-size:9.5px;margin-bottom:5px">
+          <div style="display:flex;justify-content:space-between;font-weight:700;margin-bottom:1px">
+            <span>🧠 Konsep Dasar</span>
+            <span id="domain-konsep-text">85% (17/20)</span>
+          </div>
+          <div style="background:#e2e8f0;height:5px;border-radius:2.5px;overflow:hidden">
+            <div id="domain-konsep-bar" style="background:#0f766e;height:100%;width:85%"></div>
+          </div>
+        </div>
+        <div style="font-size:9.5px;margin-bottom:5px">
+          <div style="display:flex;justify-content:space-between;font-weight:700;margin-bottom:1px">
+            <span>🧮 Prinsip Operasi</span>
+            <span id="domain-prinsip-text">70% (14/20)</span>
+          </div>
+          <div style="background:#e2e8f0;height:5px;border-radius:2.5px;overflow:hidden">
+            <div id="domain-prinsip-bar" style="background:#f97316;height:100%;width:70%"></div>
+          </div>
+        </div>
+        <div style="font-size:9.5px">
+          <div style="display:flex;justify-content:space-between;font-weight:700;margin-bottom:1px">
+            <span>💬 Verbal / Cerita</span>
+            <span id="domain-verbal-text">65% (13/20)</span>
+          </div>
+          <div style="background:#e2e8f0;height:5px;border-radius:2.5px;overflow:hidden">
+            <div id="domain-verbal-bar" style="background:#eab308;height:100%;width:65%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-box">
+        <div style="font-size:10px;font-weight:700;margin-bottom:6px">🎪 Rekor Stan Game Festival:</div>
+        <table style="margin-bottom:0;font-size:9.5px">
+          <tbody>
+            <tr>
+              <td style="padding:2px 0;border:none">🍉 Bagi Rata Buah</td>
+              <td style="padding:2px 0;text-align:right;font-weight:700;color:#ea580c;border:none">15 / 15 poin</td>
+            </tr>
+            <tr>
+              <td style="padding:2px 0;border:none">🍰 Banding &amp; Jodoh Kue</td>
+              <td style="padding:2px 0;text-align:right;font-weight:700;color:#ea580c;border:none">12 / 15 poin</td>
+            </tr>
+            <tr>
+              <td style="padding:2px 0;border:none">🧺 Pesanan Tambah Porsi</td>
+              <td style="padding:2px 0;text-align:right;font-weight:700;color:#ea580c;border:none">10 / 15 poin</td>
+            </tr>
+            <tr>
+              <td style="padding:2px 0;border:none">🏆 Grand Bazaar Campuran</td>
+              <td style="padding:2px 0;text-align:right;font-weight:700;color:#ea580c;border:none">6 / 25 poin</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3>A3. Analisis Miskonsepsi Siswa</h3>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;margin-bottom:8px">
+      <div style="font-size:9.5px;color:#64748b;margin-bottom:3px">Pola pemikiran yang perlu diluruskan:</div>
+      <div id="miskonsepsi-container" style="display:flex;gap:4px;flex-wrap:wrap">
+        <span style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:700">
+          ⚠️ Penyebut ikut dijumlahkan (a+c)/(b+b) — 2×
+        </span>
+        <span style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:700">
+          ⚠️ Penyebut besar dianggap pecahan besar (1/8 > 1/4) — 1×
+        </span>
+      </div>
+    </div>
+
+    <h3>A4. Koleksi Souvenir Pasar (Apresiasi Ketekunan Koin Kejujuran)</h3>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;margin-bottom:8px">
+      <div style="font-size:9.5px;color:#64748b;margin-bottom:4px">Item yang berhasil ditukarkan dari hasil ketekunan mengumpulkan koin:</div>
+      <div class="badge-list" id="souvenir-container">
+        <span class="badge-item">🍉 Semangka Segar</span>
+        <span class="badge-item">🍊 Jeruk Manis</span>
+        <span class="badge-item">🍰 Kue Tart</span>
+        <span class="badge-item">🍕 Pizza Keju</span>
+        <span class="badge-item">⚖️ Timbangan Adil</span>
+        <span class="badge-item">👑 Mahkota Pedagang</span>
+      </div>
+    </div>
+
+    <div class="fokus-box">
+      <span style="font-size:16px">💡</span>
+      <p><strong>Rekomendasi Pembelajaran:</strong> Ajak ananda mempraktikkan langsung dengan benda konkret seperti memotong buah semangka atau roti lipat sama besar di rumah untuk memperkuat konsep kesamaan ukuran bagian pecahan.</p>
+    </div>
+
+    <div class="validation-box">
+      <div style="display:flex;justify-content:space-between;padding:0 12px;font-size:9.5px;color:#334155">
+        <div style="text-align:center;width:140px">
+          <div>Orang Tua / Wali Murid,</div>
+          <div style="margin-top:38px;border-bottom:1px solid #94a3b8"></div>
+          <div style="margin-top:2px;font-size:8.5px;color:#64748b">( Tanda Tangan &amp; Nama )</div>
+        </div>
+        <div style="text-align:center;width:140px">
+          <div>Guru / Pembimbing,</div>
+          <div style="margin-top:38px;border-bottom:1px solid #94a3b8"></div>
+          <div style="margin-top:2px;font-size:8.5px;color:#64748b">( Tanda Tangan &amp; NIP )</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>PECAH-IN — Portofolio Pembelajaran Matematika Kontekstual Pasar (100% Offline Mode)</span>
+      <span>Dokumen Resmi Capaian Siswa</span>
+    </div>
+  </div>
+
+  <script>
+    (function hydrateReportFromStorage() {
+      try {
+        const profilRaw = localStorage.getItem("pecahin_profil");
+        if (profilRaw) {
+          const profil = JSON.parse(profilRaw);
+          if (profil.nama) document.getElementById("txt-child-name").textContent = profil.nama;
+          if (profil.streak) document.getElementById("txt-study-days").textContent = `🔥 ${profil.streak} Hari Streak`;
+        }
+
+        const dateStr = new Date().toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        });
+        document.getElementById("txt-print-date").textContent = dateStr;
+
+        if (window.location.search.includes("print=true")) {
+          window.print();
+        }
+      } catch (e) {
+        console.log("Memuat data default pratinjau laporan.", e);
+      }
+    })();
+  </script>
+</body>
+</html>

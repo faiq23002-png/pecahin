@@ -6,17 +6,18 @@ import React, { useId } from "react";
 
 const INK = "#1e293b";
 
-export type AwningTone = "teal" | "orange" | "violet" | "rose" | "red" | "blue" | "amber" | "green" | "slate";
+export type AwningTone = "teal" | "orange" | "violet" | "rose" | "red" | "blue" | "amber" | "green" | "slate" | "wood";
 
 const AWNING_COLOR: Record<AwningTone, string> = {
   teal: "#0f766e",
   green: "#15803d",
-  orange: "#f97316",
+  orange: "#78350f", // Cokelat Kayu Jati / Batang Kayu Treasure
+  wood: "#602c0b",   // Mahogany / Kayu Gelap Antik
   violet: "#7c3aed",
   rose: "#f43f5e",
   red: "#dc2626",
   blue: "#2563eb",
-  amber: "#d97706",
+  amber: "#854d0e",
   slate: "#94a3b8",
 };
 
@@ -25,10 +26,10 @@ const AWNING_COLOR: Record<AwningTone, string> = {
  * Lebar mengikuti container; motif tidak melar karena memakai pattern userSpaceOnUse.
  */
 export function Awning({
-  tone = "teal",
+  tone = "orange",
   height = 26,
   stripe = 18,
-  light = "#fff8f0",
+  light = "#fef3c7",
   outline = true,
   className = "",
 }: {
@@ -40,7 +41,10 @@ export function Awning({
   className?: string;
 }) {
   const id = useId().replace(/:/g, "");
-  const dark = AWNING_COLOR[tone];
+  const dark = AWNING_COLOR[tone] ?? AWNING_COLOR.orange;
+  const isWoodTone = tone === "orange" || tone === "wood";
+  const strokeColor = isWoodTone ? "#451a03" : INK;
+  const railColor = isWoodTone ? "#3e2412" : INK;
   const r = stripe / 2;
   const body = height - r; // tinggi bagian lurus sebelum lekukan
   const sw = outline ? 2 : 0;
@@ -54,13 +58,13 @@ export function Awning({
           <path
             d={`M0 ${body} A${r} ${r} 0 0 0 ${stripe} ${body} Z`}
             fill={dark}
-            stroke={outline ? INK : "none"}
+            stroke={outline ? strokeColor : "none"}
             strokeWidth={sw}
           />
           <path
             d={`M${stripe} ${body} A${r} ${r} 0 0 0 ${stripe * 2} ${body} Z`}
             fill={light}
-            stroke={outline ? INK : "none"}
+            stroke={outline ? strokeColor : "none"}
             strokeWidth={sw}
           />
           {/* tutup garis atas lekukan agar bersih */}
@@ -68,8 +72,8 @@ export function Awning({
         </pattern>
       </defs>
       <rect x="0" y="0" width="100%" height={height + sw} fill={`url(#aw-${id})`} />
-      {/* rel/batang kanopi */}
-      <rect x="0" y="0" width="100%" height="4" fill={INK} />
+      {/* rel/batang kanopi kayu jati */}
+      <rect x="0" y="0" width="100%" height="4" fill={railColor} />
     </svg>
   );
 }
@@ -154,10 +158,10 @@ export function HangingSign({
   return (
     <div className={`relative inline-flex flex-col items-center max-w-full ${className}`}>
       <div className="flex w-full justify-between px-5" style={{ height: rope }} aria-hidden>
-        <span className="w-0.5 bg-ink" />
-        <span className="w-0.5 bg-ink" />
+        <span className="w-0.5 bg-[#451a03]" />
+        <span className="w-0.5 bg-[#451a03]" />
       </div>
-      <div className="wood-plank rounded-xl border-2 border-ink px-3 py-1.5 shadow-[0_3px_0_#1e293b] max-w-full text-center">
+      <div className="wood-plank rounded-xl border-2 border-[#451a03] px-3 py-1.5 shadow-[0_3px_0_#451a03] max-w-full text-center">
         {children}
       </div>
     </div>

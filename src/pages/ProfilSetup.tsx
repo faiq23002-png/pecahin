@@ -53,7 +53,7 @@ export default function ProfilSetup() {
 
       {/* ================= GERBANG ATAP & JUDUL (FIXED TOP) ================= */}
       <div className="sticky top-0 z-30 w-full select-none">
-        <Awning tone="teal" height={32} stripe={22} light="#fef08a" />
+        <Awning tone="orange" height={32} stripe={22} light="#fef08a" />
         <div className="-mt-1 flex justify-center pb-1">
           <HangingSign rope={12}>
             <span className="font-display text-sm font-extrabold uppercase tracking-[0.18em] text-white [text-shadow:0_1px_0_rgba(0,0,0,.4)]">
@@ -140,7 +140,7 @@ export default function ProfilSetup() {
 
                   {/* Character Avatar inside Booth Counter */}
                   <div className="w-18 h-18 rounded-2xl bg-white/90 border-2 border-ink p-1 shadow-md grid place-items-center relative my-1 z-10">
-                    <Mascot gender={c.g} level={0} size={58} />
+                    <Mascot gender={c.g} level={1} size={58} />
                   </div>
 
                   <div className="mt-2 w-full">

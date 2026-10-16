@@ -4,12 +4,63 @@ import type { Soal } from "./types";
 
 let ctx: AudioContext | null = null;
 let muted = false;
+let sfxVolume = 0.8; // 0..1
+let musikVolume = 0.7; // 0..1
+let bgmAudio: HTMLAudioElement | null = null;
 
 export function setAudioMuted(m: boolean) {
   muted = m;
+  if (bgmAudio) {
+    if (m) {
+      bgmAudio.pause();
+    } else {
+      bgmAudio.play().catch(() => {});
+    }
+  }
 }
+
 export function isAudioMuted() {
   return muted;
+}
+
+export function setVolumeSfx(vol: number) {
+  sfxVolume = Math.max(0, Math.min(1, vol / 100));
+}
+
+export function setVolumeMusik(vol: number) {
+  musikVolume = Math.max(0, Math.min(1, vol / 100));
+  if (bgmAudio) {
+    bgmAudio.volume = musikVolume;
+  }
+}
+
+export function initOrPlayBgm() {
+  if (typeof window === "undefined") return;
+  if (!bgmAudio) {
+    bgmAudio = new Audio(import.meta.env.BASE_URL + "audio/market-bgm.mp3");
+    bgmAudio.loop = true;
+  }
+  bgmAudio.volume = musikVolume;
+  if (!muted) {
+    bgmAudio.play().catch(() => {
+      // Browser autoplay policy might need first interaction
+      const startOnInteraction = () => {
+        if (!muted && bgmAudio && bgmAudio.paused) {
+          bgmAudio.play().catch(() => {});
+        }
+        window.removeEventListener("pointerdown", startOnInteraction);
+        window.removeEventListener("keydown", startOnInteraction);
+      };
+      window.addEventListener("pointerdown", startOnInteraction, { once: true });
+      window.addEventListener("keydown", startOnInteraction, { once: true });
+    });
+  }
+}
+
+export function stopBgm() {
+  if (bgmAudio) {
+    bgmAudio.pause();
+  }
 }
 
 function ac(): AudioContext | null {
@@ -28,13 +79,15 @@ function ac(): AudioContext | null {
 function tone(freq: number, dur: number, type: OscillatorType, vol: number, delay = 0) {
   const c = ac();
   if (!c) return;
+  const effectiveVol = vol * sfxVolume;
+  if (effectiveVol <= 0.0001) return;
   const t0 = c.currentTime + delay;
   const osc = c.createOscillator();
   const g = c.createGain();
   osc.type = type;
   osc.frequency.setValueAtTime(freq, t0);
   g.gain.setValueAtTime(0.0001, t0);
-  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(effectiveVol, t0 + 0.01);
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   osc.connect(g);
   g.connect(c.destination);

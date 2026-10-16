@@ -31,14 +31,12 @@ export function InfoModalCard({
 }: ModalProps) {
   if (!isOpen) return null;
 
-  const colorScheme = type === "danger" ? "red" : type === "warning" ? "orange" : "teal";
+  const colorScheme = type === "danger" ? "red" : "orange";
 
   const awningBg =
     type === "danger"
       ? "bg-market-awning-red"
-      : type === "warning"
-      ? "bg-market-awning-orange"
-      : "bg-market-awning-teal";
+      : "bg-market-awning-orange";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-pop">

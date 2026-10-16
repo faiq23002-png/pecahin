@@ -52,7 +52,7 @@ export default function Stiker() {
 
       {/* ================= GERBANG TOKO SOUVENIR (FIXED TOP) ================= */}
       <div className="sticky top-0 z-30 w-full select-none">
-        <Awning tone="amber" height={32} stripe={22} light="#fef08a" />
+        <Awning tone="orange" height={32} stripe={22} light="#fef08a" />
         <div className="-mt-1 flex items-center justify-between px-4 pb-1">
           <button
             type="button"
@@ -84,38 +84,43 @@ export default function Stiker() {
         <div className="relative pt-1">
           <MarketFestoonLights count={8} />
         </div>
-        {/* Banner Ringkasan Koin & Koleksi */}
-        <div className="rounded-3xl border-2 border-ink bg-white p-4 shadow-[0_4px_0_#1e293b]">
-          <div className="flex items-center justify-between text-xs font-black text-ink mb-1.5">
-            <span className="flex items-center gap-1.5">
-              <span>🛍️</span>
-              <span>Koleksi Lapak Terbuka</span>
+        {/* Banner Ringkasan Koin & Koleksi - Vintage Parchment Ledger */}
+        <div className="overflow-hidden rounded-3xl border-2 border-[#451a03] bg-gradient-to-b from-[#fffefc] via-[#fbf3e0] to-[#f6ebd1] shadow-[0_5px_0_#451a03]">
+          {/* Header Pita Kayu Cokelat */}
+          <div className="flex items-center justify-between border-b-2 border-[#451a03] bg-gradient-to-r from-[#78350f] via-[#92400e] to-[#78350f] px-4 py-2.5 text-[#fef3c7]">
+            <span className="flex items-center gap-2 font-display text-xs font-black uppercase tracking-wider text-[#fef3c7] [text-shadow:0_1px_1px_rgba(0,0,0,0.6)]">
+              <span>🏺</span>
+              <span>Peti Koleksi Petualang</span>
             </span>
-            <span className="text-orange-600 font-black">{items.length} / {ITEM_TOKO.length} Item</span>
+            <span className="rounded-full border border-amber-400/40 bg-amber-950/40 px-2.5 py-0.5 text-[10px] font-black text-amber-200">
+              {items.length} / {ITEM_TOKO.length} Item
+            </span>
           </div>
 
-          {/* Bar Progres Chunky */}
-          <div className="h-2.5 w-full overflow-hidden rounded-full border-2 border-ink bg-slate-100 mb-3">
-            <div
-              className="h-full bg-orange-500 transition-all duration-500"
-              style={{ width: `${(items.length / ITEM_TOKO.length) * 100}%` }}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-center text-xs font-bold text-slate-700 bg-amber-50/80 p-2.5 rounded-2xl border-2 border-ink">
-            <div>
-              <div className="text-[10px] text-muted uppercase font-black">Koin Dihasilkan</div>
-              <div className="text-sm font-black text-teal-800">🪙 {poin} / 100</div>
+          <div className="p-4">
+            {/* Bar Progres Emas */}
+            <div className="h-3 w-full overflow-hidden rounded-full border-2 border-[#451a03] bg-stone-200/80 mb-3 p-0.5">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 transition-all duration-500"
+                style={{ width: `${(items.length / ITEM_TOKO.length) * 100}%` }}
+              />
             </div>
-            <div className="border-l-2 border-dashed border-amber-300">
-              <div className="text-[10px] text-muted uppercase font-black">Koin Terpakai</div>
-              <div className="text-sm font-black text-amber-800">🛒 {totalKoinDibelanjakan} Koin</div>
+
+            <div className="grid grid-cols-2 gap-2 text-center text-xs font-bold bg-[#fef8ea] p-2.5 rounded-2xl border-2 border-[#b45309]/30">
+              <div>
+                <div className="text-[10px] text-[#78350f]/80 uppercase font-black">Koin Dihasilkan</div>
+                <div className="text-sm font-black text-[#451a03]">🪙 {poin} / 100</div>
+              </div>
+              <div className="border-l-2 border-dashed border-[#b45309]/30">
+                <div className="text-[10px] text-[#78350f]/80 uppercase font-black">Koin Terpakai</div>
+                <div className="text-sm font-black text-[#b45309]">🛒 {totalKoinDibelanjakan} Koin</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Filter Kategori Papan Stan */}
-        <div className="flex gap-1.5 justify-between bg-white p-1.5 rounded-2xl border-2 border-ink shadow-[0_3px_0_#1e293b]">
+        {/* Filter Kategori Papan Stan Vintage */}
+        <div className="flex gap-1.5 justify-between bg-[#fef8ea] p-1.5 rounded-2xl border-2 border-[#451a03] shadow-[0_3px_0_#451a03]">
           {[
             { id: "semua", label: "Semua", emoji: "🛒" },
             { id: "buah", label: "Buah", emoji: "🍉" },
@@ -133,8 +138,8 @@ export default function Stiker() {
                 }}
                 className={`flex-1 py-1.5 px-1 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1 ${
                   active
-                    ? "bg-amber-400 text-ink border-2 border-ink shadow-[0_2px_0_#1e293b]"
-                    : "text-muted hover:text-ink hover:bg-slate-50 border-2 border-transparent"
+                    ? "bg-gradient-to-r from-amber-400 to-amber-300 text-[#451a03] border-2 border-[#451a03] shadow-[0_2px_0_#451a03]"
+                    : "text-[#78350f]/75 hover:text-[#451a03] border-2 border-transparent"
                 }`}
               >
                 <span>{tab.emoji}</span>
@@ -152,34 +157,44 @@ export default function Stiker() {
           {filteredItems.map((it) => {
             const dimiliki = items.includes(it.id);
             const cukup = profil.koin >= it.hargaKoin;
-            const itemTone: "teal" | "orange" | "violet" =
-              it.jenis === "buah" ? "teal" : it.jenis === "kue" ? "orange" : "violet";
 
             return (
               <div
                 key={it.id}
-                className={`relative flex flex-col justify-between overflow-hidden rounded-2xl border-2 transition ${
+                className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border-2 transition ${
                   dimiliki
-                    ? "border-green-600 bg-green-50/70 shadow-[0_3px_0_#15803d]"
+                    ? "border-emerald-700 bg-gradient-to-b from-[#f0fdf4] to-[#dcfce7] shadow-[0_3px_0_#14532d]"
                     : cukup
-                    ? "border-ink bg-white shadow-[0_3px_0_#1e293b]"
-                    : "border-slate-300 bg-slate-50 opacity-80"
+                    ? "border-[#451a03] bg-gradient-to-b from-[#fffefc] via-[#fbf3e0] to-[#f6ebd1] shadow-[0_4px_0_#451a03]"
+                    : "border-stone-300 bg-stone-100 opacity-80 shadow-none"
                 }`}
               >
-                {/* Mini Awning Kanopi per Etalase */}
-                <Awning tone={dimiliki ? "teal" : cukup ? itemTone : "slate"} height={14} stripe={12} outline={false} />
+                {/* List Batang Kayu Atas */}
+                <div
+                  className={`h-2 w-full ${
+                    dimiliki
+                      ? "bg-emerald-600"
+                      : "border-b border-[#451a03] bg-gradient-to-r from-[#78350f] via-[#b45309] to-[#78350f]"
+                  }`}
+                />
 
                 <div className="p-2 text-center flex flex-col items-center flex-1 justify-between">
                   <div className="w-full">
-                    {/* Wadah Piring Display Barang */}
-                    <div className="mx-auto my-1 grid h-12 w-12 place-items-center rounded-full border-2 border-ink bg-white shadow-sm">
+                    {/* Wadah Piring Display Barang Vintage */}
+                    <div
+                      className={`mx-auto my-1 grid h-12 w-12 place-items-center rounded-xl border-2 shadow-xs ${
+                        dimiliki
+                          ? "border-emerald-700 bg-white"
+                          : "border-[#78350f] bg-gradient-to-b from-amber-100 to-amber-200"
+                      }`}
+                    >
                       <span className="text-2xl" aria-hidden>{it.ikon}</span>
                     </div>
 
-                    <div className="font-display text-xs font-extrabold text-ink leading-tight mt-1 line-clamp-1">
+                    <div className="font-display text-xs font-black text-[#451a03] leading-tight mt-1 line-clamp-1">
                       {it.nama}
                     </div>
-                    <div className="mt-0.5 inline-block text-[8px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-md bg-slate-100 text-muted border border-slate-200">
+                    <div className="mt-0.5 inline-block text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-[#fef8ea] text-[#78350f] border border-[#b45309]/30">
                       {it.jenis}
                     </div>
                   </div>
@@ -187,28 +202,32 @@ export default function Stiker() {
                   {/* Tombol Beli / Label Tag */}
                   <div className="w-full mt-2">
                     {dimiliki ? (
-                      <PriceTag color="green" className="w-full justify-center">
+                      <span className="inline-flex w-full items-center justify-center rounded-xl border border-emerald-700 bg-emerald-600 py-1 text-[11px] font-black text-white shadow-xs">
                         ✓ Punya
-                      </PriceTag>
+                      </span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => handleBeli(it.id, it.nama)}
-                        className={`w-full rounded-xl py-1 px-1 text-xs font-black transition flex items-center justify-center gap-1 border-2 border-ink ${
+                        className={`w-full rounded-xl py-1 px-1 text-xs font-black transition flex items-center justify-center gap-1 border-2 ${
                           cukup
-                            ? "bg-amber-400 hover:bg-amber-500 text-ink shadow-[0_2px_0_#1e293b] active:translate-y-[2px] active:shadow-none"
-                            : "bg-slate-200 text-slate-500 cursor-not-allowed border-slate-300"
+                            ? "border-[#451a03] bg-gradient-to-b from-amber-300 to-amber-400 text-[#451a03] shadow-[0_2px_0_#451a03] active:translate-y-[1px] active:shadow-none hover:brightness-105"
+                            : "border-stone-300 bg-stone-200 text-stone-400 cursor-not-allowed"
                         }`}
                       >
-                        <IconCoin size={12} className="text-amber-800" />
+                        <IconCoin size={12} className={cukup ? "text-amber-800" : "text-stone-400"} />
                         <span>{it.hargaKoin}</span>
                       </button>
                     )}
                   </div>
                 </div>
 
-                {/* Meja Konter Kayu Etalase */}
-                <Counter className={dimiliki ? "opacity-90" : ""} />
+                {/* Lis Kayu Bawah */}
+                <div
+                  className={`h-1.5 w-full border-t ${
+                    dimiliki ? "border-emerald-700/30 bg-emerald-700/15" : "border-[#451a03]/30 bg-[#78350f]/15"
+                  }`}
+                />
               </div>
             );
           })}

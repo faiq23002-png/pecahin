@@ -31,20 +31,39 @@ function Stall({ it, onTap }: { it: Item; onTap: () => void }) {
     <button
       type="button"
       onClick={onTap}
-      className="relative flex flex-col overflow-hidden rounded-2xl border-2 border-ink bg-white text-left shadow-[0_3px_0_#1e293b] transition active:translate-y-[2px] active:shadow-[0_1px_0_#1e293b]"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-[#451a03] bg-gradient-to-b from-[#fffefc] via-[#fbf3e0] to-[#f6ebd1] text-left shadow-[0_4px_0_#451a03] transition active:translate-y-[2px] active:shadow-[0_1px_0_#451a03]"
     >
-      <Awning tone={it.tone} height={20} stripe={16} outline={false} />
-      <div className="flex flex-1 flex-col px-3 pt-2 pb-3">
+      {/* Batang Kayu Penggulung Atas */}
+      <div className="h-2 w-full border-b border-[#451a03] bg-gradient-to-r from-[#78350f] via-[#b45309] to-[#78350f]" />
+
+      <div className="flex flex-1 flex-col p-3">
         <div className="flex items-start justify-between gap-1">
-          <span className={`grid h-12 w-12 place-items-center rounded-full border-2 border-ink bg-white shadow-[0_2px_0_#1e293b] ${ICON_TONE[it.tone]}`}>
+          {/* Medali Ikon Vintage */}
+          <span className="grid h-12 w-12 place-items-center rounded-xl border-2 border-[#78350f] bg-gradient-to-b from-amber-100 to-amber-200 text-[#451a03] shadow-[0_2px_0_#451a03]">
             {it.icon}
           </span>
-          {it.tag && <PriceTag color={it.tag.color}>{it.tag.text}</PriceTag>}
+          {it.tag && (
+            <span
+              className={`rounded-lg px-2 py-0.5 text-[10px] font-black shadow-xs border ${
+                it.tag.color === "red"
+                  ? "border-red-700 bg-red-600 text-white"
+                  : "border-[#b45309] bg-amber-200/90 text-[#78350f]"
+              }`}
+            >
+              {it.tag.text}
+            </span>
+          )}
         </div>
-        <div className="mt-2.5 font-display text-sm font-extrabold leading-tight text-ink">{it.label}</div>
-        <div className="mt-0.5 text-[11px] font-semibold leading-snug text-muted">{it.sub}</div>
+        <div className="mt-2.5 font-display text-sm font-black leading-tight text-[#451a03] group-hover:text-[#78350f] transition">
+          {it.label}
+        </div>
+        <div className="mt-0.5 text-[11px] font-bold leading-snug text-[#78350f]/80">
+          {it.sub}
+        </div>
       </div>
-      <Counter />
+
+      {/* Lis Kayu Bawah */}
+      <div className="h-1.5 w-full border-t border-[#451a03]/30 bg-[#78350f]/15" />
     </button>
   );
 }
@@ -56,23 +75,13 @@ export default function Menu() {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
 
   const belajar: Item[] = [
-    { label: "Rapor", sub: "Hasil belajarmu", icon: <IconChart size={24} />, tone: "teal", action: () => navigate("rapor") },
+    { label: "Rapor", sub: "Pratinjau rapor PDF", icon: <IconChart size={24} />, tone: "teal", action: () => navigate("rapor") },
     { label: "Maskot", sub: "Rumah Peco & Pica", icon: <IconMaskot size={24} />, tone: "orange", action: () => navigate("rumah-maskot") },
-    { label: "Misi", sub: "Tantangan harian", icon: <IconFlame size={24} />, tone: "rose", action: () => navigate("misi") },
-    { label: "Latihan Ulang", sub: "Ulangi materi lapak", icon: <IconRefresh size={24} />, tone: "violet", action: () => navigate("materi") },
   ];
 
   const layanan: Item[] = [
+    { label: "Pengaturan Toko", sub: "Suara, karakter & demo", icon: <IconGear size={24} />, tone: "orange", action: () => navigate("pengaturan") },
     { label: "Bantuan", sub: "Cara pakai aplikasi", icon: <IconQuestion size={24} />, tone: "teal", action: () => setBantuan(true) },
-    {
-      label: "Suara",
-      sub: "Musik & efek bunyi",
-      icon: <IconSound size={24} off={!profil?.suaraOn} />,
-      tone: profil?.suaraOn ? "orange" : "slate",
-      action: () => toggleSuara(),
-      tag: { text: profil?.suaraOn ? "Nyala" : "Mati", color: profil?.suaraOn ? "green" : "white" },
-    },
-    { label: "Atur", sub: "Pengaturan aplikasi", icon: <IconGear size={24} />, tone: "violet", action: () => navigate("pengaturan") },
     {
       label: "Reset Data",
       sub: "Hapus progres & akun",
@@ -103,7 +112,7 @@ export default function Menu() {
 
       {/* ================= GERBANG ATAP & JUDUL (FIXED TOP) ================= */}
       <div className="sticky top-0 z-30 w-full select-none">
-        <Awning tone="violet" height={32} stripe={22} light="#f5f3ff" />
+        <Awning tone="orange" height={32} stripe={22} light="#fef08a" />
         <div className="-mt-1 flex justify-center">
           <HangingSign rope={10}>
             <span className="font-display text-sm font-extrabold uppercase tracking-[0.18em] text-white [text-shadow:0_1px_0_rgba(0,0,0,.4)]">
@@ -146,6 +155,16 @@ export default function Menu() {
             {layanan.map((it) => (
               <Stall key={it.label} it={it} onTap={tap(it)} />
             ))}
+          </div>
+
+          {/* Copyright & Info Versi */}
+          <div className="mt-8 mb-4 text-center">
+            <p className="text-xs font-bold text-amber-200 [text-shadow:0_1px_2px_rgba(0,0,0,0.85)]">
+              PECAH-IN · Petualangan Pecahan di Pasar
+            </p>
+            <p className="text-[11px] font-semibold text-white/70 [text-shadow:0_1px_2px_rgba(0,0,0,0.85)]">
+              versi 0.1.0 · FIP Championship 2026
+            </p>
           </div>
         </section>
       </div>
