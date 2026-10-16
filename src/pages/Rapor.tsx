@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useApp } from "@/lib/profil-context";
 import { hitungPenguasaan, persenPenguasaan, miskonsepsiTersering, MIN_JAWABAN_LABEL } from "@/lib/diagnosis";
+import { TIPS_MISKONSEPSI } from "@/lib/miskonsepsi-tips";
 import { simpanRaporPDF } from "@/lib/rapor";
 import { BottomNav } from "@/components/BottomNav";
 import { PrimaryButton, Card } from "@/components/ui";
@@ -21,6 +22,7 @@ export default function Rapor() {
   const { navigate, goBack } = useRouter();
   const [isResetting, setIsResetting] = useState(false);
   const [showConfirmReset, setShowConfirmReset] = useState(false);
+  const [expandedTip, setExpandedTip] = useState<string | null>(null);
 
   if (isResetting) {
     return (
@@ -89,17 +91,68 @@ export default function Rapor() {
         </Card>
 
         <Card className="mt-3">
-          <div className="font-display text-base font-bold text-ink">Miskonsepsi yang perlu diperhatikan</div>
+          <div className="flex items-center justify-between">
+            <div className="font-display text-base font-bold text-ink">Miskonsepsi yang perlu diperhatikan</div>
+            {top.length > 0 && (
+              <span className="text-[11px] font-bold text-slate-500">Tap untuk tips 💡</span>
+            )}
+          </div>
           {top.length === 0 ? (
             <p className="mt-2 text-sm font-semibold text-muted">Belum ada data. Kerjakan Ayo Latihan dulu!</p>
           ) : (
-            <ul className="mt-2 flex flex-col gap-1.5">
-              {top.map((t) => (
-                <li key={t.id} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-sm font-semibold text-ink">
-                  <span>{t.nama}</span>
-                  <span className="text-muted">{t.count}×</span>
-                </li>
-              ))}
+            <ul className="mt-2.5 flex flex-col gap-2">
+              {top.map((t) => {
+                const tip = TIPS_MISKONSEPSI[t.id];
+                const isOpen = expandedTip === t.id;
+                return (
+                  <li key={t.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/80 transition shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sfx("tap");
+                        setExpandedTip(isOpen ? null : t.id);
+                      }}
+                      className="flex w-full items-center justify-between p-3 text-left transition hover:bg-slate-100/90 active:bg-slate-200/80"
+                    >
+                      <div className="flex items-center gap-2.5 pr-2">
+                        <span className="text-base">{tip?.emoji ?? "⚠️"}</span>
+                        <div>
+                          <div className="text-xs sm:text-sm font-bold text-ink leading-snug">{t.nama}</div>
+                          <div className="text-[10px] font-semibold text-slate-500">
+                            {tip?.lapak ?? "Latihan Pecahan"}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-black text-red-700">
+                          {t.count}×
+                        </span>
+                        <span className="grid h-6 w-6 place-items-center rounded-full bg-white border border-slate-200 text-[10px] font-black text-slate-600 shadow-2xs">
+                          {isOpen ? "▲" : "▼"}
+                        </span>
+                      </div>
+                    </button>
+
+                    {isOpen && tip && (
+                      <div className="border-t border-amber-200 bg-amber-50/70 p-3 text-xs animate-pop">
+                        <div className="flex items-center gap-1 font-display font-extrabold text-amber-900 mb-1">
+                          <span>💡</span> Tips {profil.gender === "cowo" ? "Peco" : "Pica"}: {tip.judulTips}
+                        </div>
+                        <div className="rounded-xl bg-white p-2 border border-amber-200 text-amber-950 font-bold mb-2 shadow-2xs">
+                          <span className="text-amber-800 font-black">Trik:</span> {tip.trikSingkat}
+                        </div>
+                        <p className="text-slate-700 leading-relaxed font-semibold mb-2">
+                          {tip.penjelasan}
+                        </p>
+                        <div className="rounded-xl bg-teal-50 border border-teal-200 p-2 text-teal-900 font-semibold text-[11px]">
+                          <span className="font-extrabold text-teal-950">📌 Contoh: </span>
+                          {tip.contoh}
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </Card>

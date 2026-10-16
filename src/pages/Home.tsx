@@ -1,8 +1,9 @@
 /** Beranda — desain ulang: hierarki jelas, blok warna solid, aksen "chunky" yang playful. */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "@/lib/router-context";
 import { useApp } from "@/lib/profil-context";
 import { MATERI, SOAL, MASKOT_STAGES } from "@/lib/content";
+import { getTipsMiskonsepsiSiswa } from "@/lib/miskonsepsi-tips";
 import { semuaSelesai } from "@/lib/progress";
 import { poinMateri, poinGame, POIN_GAME_MAX, POIN_LATIHAN_MAX, GAME_ROUNDS } from "@/lib/poin";
 import { todayStr } from "@/lib/util";
@@ -104,6 +105,136 @@ export default function Home() {
     }
   });
   const [dialogIndex, setDialogIndex] = useState(0);
+
+  // Tips Miskonsepsi Siswa yang terdeteksi dari riwayat latihan/soal (MPI Evaluasi Belajar)
+  const tipsMiskonsepsi = useMemo(() => getTipsMiskonsepsiSiswa(riwayat, 10), [riwayat]);
+
+  // Pool tips umum/random untuk backup hingga kuota pas 5 tips (atau 6 jika miskonsepsi >= 5)
+  const RANDOM_TIPS_POOL = useMemo(() => [
+    {
+      kategori: "umum" as const,
+      badge: "🍉 Rangkuman Lapak 1",
+      judul: "Bagian Adil & Sama Besar",
+      isi: (
+        <p className="text-slate-700 font-semibold leading-relaxed">
+          Pecahan itu harus <b>dibagi sama besar</b>! Angka di atas disebut <b>Pembilang</b> (bagian yang diambil), dan di bawah disebut <b>Penyebut</b> (total semua potongan).
+        </p>
+      ),
+    },
+    {
+      kategori: "umum" as const,
+      badge: "🍰 Rahasia Lapak 2",
+      judul: "Penyebut Besar vs Ukuran Porsi",
+      isi: (
+        <p className="text-slate-700 font-semibold leading-relaxed">
+          Makin besar penyebutnya, potongan kuenya makin <b>kecil</b> loh! Misalnya <b>1/4 potong</b> lebih besar daripada <b>1/8 potong</b>.
+        </p>
+      ),
+    },
+    {
+      kategori: "umum" as const,
+      badge: "🧺 Aturan Tambah Porsi",
+      judul: "Penjumlahan Penyebut Sama",
+      isi: (
+        <p className="text-slate-700 font-semibold leading-relaxed">
+          Saat menjumlahkan pecahan yang penyebutnya sama, cukup jumlahkan <b>angka atasnya</b> saja! Ukuran potongannya tidak bertambah.
+        </p>
+      ),
+    },
+    {
+      kategori: "umum" as const,
+      badge: "📄 Trik Kertas Lipat",
+      judul: "Sulap Pecahan Senilai",
+      isi: (
+        <p className="text-slate-700 font-semibold leading-relaxed">
+          Lipat kertas jadi 2 bagian (<b>1/2</b>), lalu lipat lagi jadi 4 (<b>2/4</b>). Luas kertas yang diarsir tetap sama besarnya! Angkanya beda, tapi nilainya tetap sama persis.
+        </p>
+      ),
+    },
+    {
+      kategori: "umum" as const,
+      badge: "🐊 Trik Mulut Buaya",
+      judul: "Tanda Lebih Besar (>)",
+      isi: (
+        <p className="text-slate-700 font-semibold leading-relaxed">
+          Ingat mulut buaya lapar! Mulut tanda (<b>&gt;</b>) atau (<b>&lt;</b>) selalu terbuka mencaplok makanan/pecahan yang porsinya <b>lebih banyak</b>!
+        </p>
+      ),
+    },
+    {
+      kategori: "umum" as const,
+      badge: "🔥 Semangat Saudagar Cilik",
+      judul: "Ayo Kumpulkan Bintang!",
+      isi: (
+        <p className="text-slate-700 font-semibold leading-relaxed">
+          Hebat banget, {profil.nama}! Kamu sudah mengumpulkan <b>{poin} poin</b>. Terus berlatih agar maskotmu berevolusi ke pangkat tertinggi!
+        </p>
+      ),
+    },
+    {
+      kategori: "umum" as const,
+      badge: "⚖️ Kasir Teliti Pasar",
+      judul: "Cek Ulang Sebelum Menjawab",
+      isi: (
+        <p className="text-slate-700 font-semibold leading-relaxed">
+          Kasir hebat selalu teliti! Sebelum memilih jawaban, baca kalimat soal dengan saksama dan periksa apakah diminta bagian yang terarsir atau sisanya.
+        </p>
+      ),
+    },
+  ], [profil.nama, poin]);
+
+  // Aturan kuota tips:
+  // - Jika miskonsepsi >= 5: tampilkan Top 5 miskonsepsi + 1 tips random = TOTAL 6 TIPS.
+  // - Jika miskonsepsi < 5: tampilkan semua miskonsepsi + backup tips random = TOTAL 5 TIPS.
+  const allTips = useMemo(() => {
+    const list: Array<{
+      kategori: "miskonsepsi" | "umum";
+      badge: string;
+      judul: string;
+      sub?: string;
+      isi: React.ReactNode;
+    }> = [];
+
+    const isLebihDariSamaDengan5 = tipsMiskonsepsi.length >= 5;
+    const targetMiskonsepsiCount = isLebihDariSamaDengan5 ? 5 : tipsMiskonsepsi.length;
+    const targetTotal = isLebihDariSamaDengan5 ? 6 : 5;
+
+    // 1. Masukkan miskonsepsi siswa (Top 5 jika >= 5, atau seluruhnya jika < 5)
+    for (let i = 0; i < targetMiskonsepsiCount; i++) {
+      const tip = tipsMiskonsepsi[i];
+      list.push({
+        kategori: "miskonsepsi",
+        badge: `🎯 Trik ${tip.lapak} · Khusus Untukmu`,
+        judul: `${tip.emoji} ${tip.judulTips}`,
+        sub: tip.nama,
+        isi: (
+          <div className="space-y-1.5">
+            <div className="rounded-xl border border-amber-300 bg-amber-50 p-2 text-[11px] font-bold text-amber-900 leading-snug">
+              <span className="font-extrabold text-amber-950">💡 Trik Ingat:</span> {tip.trikSingkat}
+            </div>
+            <p className="text-[11px] text-slate-700 leading-relaxed font-semibold">
+              {tip.penjelasan}
+            </p>
+            <div className="rounded-lg bg-teal-50 border border-teal-200 p-1.5 text-[10.5px] font-medium text-teal-900">
+              <span className="font-bold text-teal-950">📌 Contoh:</span> {tip.contoh}
+            </div>
+          </div>
+        ),
+      });
+    }
+
+    // 2. Tambahkan tips random:
+    // - Jika miskonsepsi >= 5: menambah 1 tips random penyemangat (jadi pas 6)
+    // - Jika miskonsepsi < 5: menutup sisa slot sampai pas 5 tips
+    const sisaSlot = targetTotal - list.length;
+    if (sisaSlot > 0) {
+      for (let i = 0; i < sisaSlot && i < RANDOM_TIPS_POOL.length; i++) {
+        list.push(RANDOM_TIPS_POOL[i]);
+      }
+    }
+
+    return list;
+  }, [tipsMiskonsepsi, RANDOM_TIPS_POOL]);
 
   useEffect(() => {
     if (!toast) return;
@@ -699,8 +830,13 @@ export default function Home() {
               } catch {}
             }}
             aria-label="Tampilkan Maskot"
-            className="flex items-center gap-2 rounded-l-2xl border-2 border-r-0 border-ink bg-amber-400 pl-3.5 pr-2 py-2 text-ink shadow-[-4px_4px_12px_rgba(0,0,0,0.25)] transition active:scale-95 hover:bg-amber-300"
+            className="relative flex items-center gap-2 rounded-l-2xl border-2 border-r-0 border-ink bg-amber-400 pl-3.5 pr-2 py-2 text-ink shadow-[-4px_4px_12px_rgba(0,0,0,0.25)] transition active:scale-95 hover:bg-amber-300"
           >
+            {tipsMiskonsepsi.length > 0 && (
+              <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-black text-white shadow ring-2 ring-white animate-pulse">
+                !
+              </span>
+            )}
             <span className="text-base font-black text-amber-950 animate-pulse">◀</span>
             <div className="h-8 w-8 rounded-full bg-white p-0.5 border-2 border-ink shadow-xs">
               <Mascot gender={profil.gender} level={maskotLevel} size={28} />
@@ -709,78 +845,76 @@ export default function Home() {
         ) : (
           <div className="relative flex flex-col items-end">
             {/* Pop-up Rangkuman Materi & Semangat Belajar */}
-            {showMascotDialog && (
-              <div className="mb-2 w-72 max-w-[85vw] rounded-3xl border-2 border-ink bg-white p-4 shadow-[0_8px_20px_rgba(0,0,0,0.25)] animate-pop">
-                <div className="flex items-center justify-between border-b border-amber-200 pb-2 mb-2.5">
-                  <span className="inline-flex items-center gap-1 text-xs font-black text-amber-800">
-                    <span>💡</span> Tips {profil.gender === "cowo" ? "Peco" : "Pica"}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sfx("tap");
-                      setShowMascotDialog(false);
-                    }}
-                    aria-label="Tutup pesan"
-                    className="h-6 w-6 rounded-full bg-slate-100 grid place-items-center text-xs font-extrabold text-slate-500 hover:bg-slate-200"
-                  >
-                    ✕
-                  </button>
-                </div>
+            {showMascotDialog && allTips.length > 0 && (() => {
+              const activeTipIndex = dialogIndex % allTips.length;
+              const curTip = allTips[activeTipIndex];
+              return (
+                <div className="mb-2 w-72 max-w-[85vw] rounded-3xl border-2 border-ink bg-white p-4 shadow-[0_8px_20px_rgba(0,0,0,0.25)] animate-pop">
+                  <div className="flex items-center justify-between border-b border-amber-200 pb-2 mb-2.5">
+                    <span className="inline-flex items-center gap-1 text-xs font-black text-amber-800">
+                      <span>💡</span> Tips {profil.gender === "cowo" ? "Peco" : "Pica"}
+                      {curTip.kategori === "miskonsepsi" && (
+                        <span className="ml-1 rounded-full bg-rose-500 px-1.5 py-0.5 text-[8.5px] font-black text-white uppercase tracking-wider">
+                          Evaluasi
+                        </span>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sfx("tap");
+                        setShowMascotDialog(false);
+                      }}
+                      aria-label="Tutup pesan"
+                      className="h-6 w-6 rounded-full bg-slate-100 grid place-items-center text-xs font-extrabold text-slate-500 hover:bg-slate-200"
+                    >
+                      ✕
+                    </button>
+                  </div>
 
-                {/* Konten Edukatif & Rangkuman Materi */}
-                <div className="text-xs font-bold text-ink leading-relaxed">
-                  {dialogIndex % 4 === 0 && (
-                    <>
-                      <p className="text-teal-700 font-extrabold mb-1">🍉 Rangkuman Lapak 1:</p>
-                      <p className="text-slate-700 font-semibold">
-                        Pecahan itu harus <b>dibagi sama besar</b>! Angka di atas disebut <b>Pembilang</b> (bagian yang diambil), dan di bawah disebut <b>Penyebut</b> (total semua potongan).
-                      </p>
-                    </>
-                  )}
-                  {dialogIndex % 4 === 1 && (
-                    <>
-                      <p className="text-orange-600 font-extrabold mb-1">🍰 Rahasia Lapak 2:</p>
-                      <p className="text-slate-700 font-semibold">
-                        Makin besar penyebutnya, potongan kuenya makin <b>kecil</b> loh! Misalnya <b>1/4 potong</b> lebih besar daripada <b>1/8 potong</b>.
-                      </p>
-                    </>
-                  )}
-                  {dialogIndex % 4 === 2 && (
-                    <>
-                      <p className="text-violet-700 font-extrabold mb-1">🧺 Aturan Tambah Porsi:</p>
-                      <p className="text-slate-700 font-semibold">
-                        Saat menjumlahkan pecahan yang penyebutnya sama, cukup jumlahkan <b>angka atasnya</b> saja! Ukuran potongannya tidak bertambah.
-                      </p>
-                    </>
-                  )}
-                  {dialogIndex % 4 === 3 && (
-                    <>
-                      <p className="text-amber-700 font-extrabold mb-1">🔥 Semangat Saudagar Cilik:</p>
-                      <p className="text-slate-700 font-semibold">
-                        Hebat banget, {profil.nama}! Kamu sudah mengumpulkan <b>{poin} poin</b>. Terus berlatih agar maskotmu berevolusi ke pangkat tertinggi!
-                      </p>
-                    </>
-                  )}
-                </div>
+                  {/* Konten Edukatif & Rangkuman Materi */}
+                  <div className="text-xs font-bold text-ink leading-relaxed">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className={`text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+                        curTip.kategori === "miskonsepsi"
+                          ? "bg-rose-100 text-rose-800 border border-rose-300"
+                          : "bg-teal-50 text-teal-800 border border-teal-200"
+                      }`}>
+                        {curTip.badge}
+                      </span>
+                    </div>
+                    <div className="font-display text-sm font-extrabold text-ink mb-1.5">
+                      {curTip.judul}
+                    </div>
+                    {curTip.sub && (
+                      <div className="text-[10px] font-semibold text-slate-500 mb-2">
+                        Fokus: {curTip.sub}
+                      </div>
+                    )}
+                    {curTip.isi}
+                  </div>
 
-                <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100">
-                  <span className="text-[10px] font-bold text-muted">
-                    {dialogIndex % 4 + 1} dari 4 tips
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sfx("pop");
-                      setDialogIndex((prev) => prev + 1);
-                    }}
-                    className="text-[11px] font-black text-orange-600 hover:text-orange-700 flex items-center gap-1"
-                  >
-                    <span>Tips Lain</span> <span>›</span>
-                  </button>
+                  <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100">
+                    <span className="text-[10px] font-bold text-muted">
+                      {activeTipIndex + 1} dari {allTips.length} tips
+                      {tipsMiskonsepsi.length > 0 && activeTipIndex < tipsMiskonsepsi.length && (
+                        <span className="ml-1 text-rose-600 font-black">• Khusus</span>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sfx("pop");
+                        setDialogIndex((prev) => prev + 1);
+                      }}
+                      className="text-[11px] font-black text-orange-600 hover:text-orange-700 flex items-center gap-1"
+                    >
+                      <span>Tips Lain</span> <span>›</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Karakter Maskot Interaktif + Tombol Tutup X Geser Kanan */}
             <div className="relative flex items-end">
@@ -819,8 +953,8 @@ export default function Home() {
                 
                 {/* Bubble Icon Chat Kecil */}
                 {!showMascotDialog && (
-                  <span className="absolute top-1 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-ink bg-orange-500 text-xs font-bold text-white shadow-md animate-bounce">
-                    💬
+                  <span className="absolute top-0 right-0 flex items-center gap-0.5 rounded-full border border-ink bg-orange-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white shadow-md animate-bounce">
+                    {tipsMiskonsepsi.length > 0 ? "💡 Tips" : "💬"}
                   </span>
                 )}
               </button>
