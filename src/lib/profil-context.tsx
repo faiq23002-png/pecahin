@@ -197,13 +197,8 @@ export const useApp = create<AppStore>()((set, get) => {
         if (added <= 0) return state;
         
         const newHarian = { ...state.harian, [t]: { ...h, koinHari: h.koinHari + added } };
-        const newProfil = { ...state.profil, lastAktif: t }; // Koin update logic handled manually if bypassing sync
-        
-        // However, koin is purely calculated in koinBalance from totalPoin.
-        // Wait, in old code: setProfil({...profil, koin: profil.koin + add})
-        // But koinBalance is also dynamically calculated: koinBalance = Math.max(0, poin - spend)
-        // This is a conflict in the original code! Koin was both tracked in profil.koin and overridden by koinBalance.
-        // Let's just persist harian so the limit is tracked, and koinBalance stays dynamic.
+        const newProfil = { ...state.profil, lastAktif: t };
+        // Saldo koin belanja disinkronkan secara konsisten via syncCalculatedFields (poin - spend)
         return { harian: newHarian, profil: newProfil };
       });
       return added;
@@ -249,12 +244,11 @@ export const useApp = create<AppStore>()((set, get) => {
       set((state) => {
         if (!state.profil) return state;
         const targetKoin = Math.max(0, jumlah);
-        // Create synthetic history or adjust riwayat if needed to reflect poin, or set koin directly in profil
         const spend = state.items.reduce((acc, itemId) => {
           const item = ITEM_TOKO.find((i) => i.id === itemId);
           return acc + (item ? item.hargaKoin : 0);
         }, 0);
-        // We ensure riwayat has enough points to match desired koin
+        // Menyelaraskan poin dengan saldo koin demo
         const desiredPoin = targetKoin + spend;
         const currentPoin = totalPoin(state.riwayat, state.game);
         let newRiwayat = [...state.riwayat];
@@ -277,7 +271,7 @@ export const useApp = create<AppStore>()((set, get) => {
         return {
           ...newState,
           ...syncCalculatedFields({ ...state, ...newState }),
-          profil: updatedProfil, // explicitly maintain custom koin amount
+          profil: updatedProfil,
         };
       });
     },
