@@ -293,11 +293,11 @@ export default function Home() {
   const gameCards: Array<{
     id: string; nama: string; desc: string; emoji: string; route: string; terkunci: boolean; syarat: string; skor: number; tone: Tone;
   }> = [
-    { id: "g1", nama: "Bagi Rata", desc: "Potong buah sama besar", emoji: "🍉", route: "game-bagi-rata", terkunci: !progress["m1"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 1", skor: game["g1"]?.skorTerbaik ?? 0, tone: "teal" },
-    { id: "g2", nama: "Banding & Senilai", desc: "Cari pasangan senilai", emoji: "🍰", route: "game-banding-jodoh", terkunci: !progress["m2"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 2", skor: game["g2"]?.skorTerbaik ?? 0, tone: "rose" },
-    { id: "g3", nama: "Tambah Porsi", desc: "Jumlahkan pesanan", emoji: "🧺", route: "game-lapak-jualan", terkunci: !progress["m3"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 3", skor: game["g3"]?.skorTerbaik ?? 0, tone: "violet" },
-    { id: "gCampuran", nama: "Grand Bazaar", desc: "Tantangan semua materi", emoji: "🏆", route: "game-campuran", terkunci: !semuaSelesai(progress) && !modeJuri, syarat: "Selesaikan semua lapak", skor: game["gCampuran"]?.skorTerbaik ?? 0, tone: "teal" },
-  ];
+      { id: "g1", nama: "Bagi Rata", desc: "Potong buah sama besar", emoji: "🍉", route: "game-bagi-rata", terkunci: !progress["m1"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 1", skor: game["g1"]?.skorTerbaik ?? 0, tone: "teal" },
+      { id: "g2", nama: "Banding & Senilai", desc: "Cari pasangan senilai", emoji: "🍰", route: "game-banding-jodoh", terkunci: !progress["m2"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 2", skor: game["g2"]?.skorTerbaik ?? 0, tone: "rose" },
+      { id: "g3", nama: "Tambah Porsi", desc: "Jumlahkan pesanan", emoji: "🧺", route: "game-lapak-jualan", terkunci: !progress["m3"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 3", skor: game["g3"]?.skorTerbaik ?? 0, tone: "violet" },
+      { id: "gCampuran", nama: "Grand Bazaar", desc: "Tantangan semua materi", emoji: "🏆", route: "game-campuran", terkunci: !semuaSelesai(progress) && !modeJuri, syarat: "Selesaikan semua lapak", skor: game["gCampuran"]?.skorTerbaik ?? 0, tone: "teal" },
+    ];
   const poinGameTotal = poinGame(game);
 
   /* ---------- Maskot & target berikutnya ---------- */
@@ -502,7 +502,7 @@ export default function Home() {
                       "🏆 Saudagar Legendaris! Pangkat tertinggi tercapai."
                     )}
                   </p>
-                  
+
                   {/* Badge Rekap Hasil Pasar */}
                   <div className="mt-2.5 flex flex-wrap gap-2 text-[11px] font-bold">
                     <span className="inline-flex items-center gap-1 rounded-lg border border-[#b45309]/30 bg-[#fef8ea] px-2 py-0.5 text-[#78350f] shadow-xs">
@@ -633,19 +633,17 @@ export default function Home() {
                   sfx("pop");
                   navigate(`materi${m.urutan}`);
                 }}
-                className={`group relative block w-full overflow-hidden rounded-2xl border-2 text-left transition active:translate-y-[2px] ${
-                  m.terkunci
+                className={`group relative block w-full overflow-hidden rounded-2xl border-2 text-left transition active:translate-y-[2px] ${m.terkunci
                     ? "border-stone-400/80 bg-stone-100 shadow-[0_3px_0_#78716c]"
                     : "border-[#451a03] bg-gradient-to-r from-[#fffdfa] via-[#fdf6e6] to-[#faf0d9] shadow-[0_4px_0_#451a03] active:shadow-[0_1px_0_#451a03]"
-                }`}
+                  }`}
               >
                 {/* List Atas Emas Vintage */}
                 <div
-                  className={`h-1.5 w-full ${
-                    m.terkunci
+                  className={`h-1.5 w-full ${m.terkunci
                       ? "bg-stone-300"
                       : "bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600"
-                  }`}
+                    }`}
                 />
 
                 <div className="relative flex items-center gap-3 px-3.5 py-3">
@@ -684,13 +682,12 @@ export default function Home() {
                         return (
                           <span
                             key={i}
-                            className={`inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[9px] font-black ${
-                              done
+                            className={`inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[9px] font-black ${done
                                 ? "border border-amber-600/40 bg-amber-400/30 text-[#451a03]"
                                 : m.terkunci
-                                ? "border border-stone-300 bg-stone-200/50 text-stone-400"
-                                : "border border-stone-300/80 bg-white/70 text-stone-400"
-                            }`}
+                                  ? "border border-stone-300 bg-stone-200/50 text-stone-400"
+                                  : "border border-stone-300/80 bg-white/70 text-stone-400"
+                              }`}
                           >
                             <span>{done ? "✓" : "○"}</span>
                             <span>{label}</span>
@@ -748,11 +745,10 @@ export default function Home() {
                   sfx("tap");
                   navigate(g.route);
                 }}
-                className={`relative flex flex-col overflow-hidden rounded-2xl border-2 text-left transition active:translate-y-[2px] ${
-                  g.terkunci
+                className={`relative flex flex-col overflow-hidden rounded-2xl border-2 text-left transition active:translate-y-[2px] ${g.terkunci
                     ? "border-stone-400 bg-stone-100/95 shadow-[0_3px_0_#78716c]"
                     : "border-[#451a03] bg-gradient-to-b from-[#fffefc] via-[#fbf3e0] to-[#f6ebd1] shadow-[0_4px_0_#451a03] active:shadow-[0_1px_0_#451a03]"
-                }`}
+                  }`}
               >
                 {/* List Batang Kayu Atas */}
                 <div className="h-2 w-full border-b border-[#451a03] bg-gradient-to-r from-[#78350f] via-[#b45309] to-[#78350f]" />
@@ -760,11 +756,10 @@ export default function Home() {
                 <div className="flex flex-1 flex-col p-3">
                   <div className="flex items-start justify-between">
                     <span
-                      className={`grid h-11 w-11 place-items-center rounded-xl border-2 ${
-                        g.terkunci
+                      className={`grid h-11 w-11 place-items-center rounded-xl border-2 ${g.terkunci
                           ? "border-stone-300 bg-stone-200"
                           : "border-[#451a03] bg-gradient-to-b from-amber-100 to-amber-200 shadow-[0_2px_0_#451a03]"
-                      }`}
+                        }`}
                     >
                       <span className="text-2xl" aria-hidden>{g.emoji}</span>
                     </span>
@@ -827,7 +822,7 @@ export default function Home() {
               setIsMascotMinimized(false);
               try {
                 localStorage.setItem("mpi_minimized", "false");
-              } catch {}
+              } catch { }
             }}
             aria-label="Tampilkan Maskot"
             className="relative flex items-center gap-2 rounded-l-2xl border-2 border-r-0 border-ink bg-amber-400 pl-3.5 pr-2 py-2 text-ink shadow-[-4px_4px_12px_rgba(0,0,0,0.25)] transition active:scale-95 hover:bg-amber-300"
@@ -875,11 +870,10 @@ export default function Home() {
                   {/* Konten Edukatif & Rangkuman Materi */}
                   <div className="text-xs font-bold text-ink leading-relaxed">
                     <div className="mb-1.5 flex items-center justify-between">
-                      <span className={`text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full ${
-                        curTip.kategori === "miskonsepsi"
+                      <span className={`text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full ${curTip.kategori === "miskonsepsi"
                           ? "bg-rose-100 text-rose-800 border border-rose-300"
                           : "bg-teal-50 text-teal-800 border border-teal-200"
-                      }`}>
+                        }`}>
                         {curTip.badge}
                       </span>
                     </div>
@@ -927,7 +921,7 @@ export default function Home() {
                   setIsMascotMinimized(true);
                   try {
                     localStorage.setItem("mpi_minimized", "true");
-                  } catch {}
+                  } catch { }
                 }}
                 aria-label="Sembunyikan Maskot ke Kanan"
                 title="Sembunyikan Maskot"
@@ -941,16 +935,18 @@ export default function Home() {
                 type="button"
                 onClick={() => {
                   sfx("pop");
-                  setShowMascotDialog((prev) => !prev);
                   if (!showMascotDialog) {
-                    setDialogIndex((prev) => prev + 1);
+                    setDialogIndex(0);
+                    setShowMascotDialog(true);
+                  } else {
+                    setShowMascotDialog(false);
                   }
                 }}
                 aria-label="Bicara dengan maskot"
                 className="relative flex items-end justify-center transition-transform active:scale-95 hover:scale-105"
               >
                 <Mascot gender={profil.gender} level={maskotLevel} size={76} />
-                
+
                 {/* Bubble Icon Chat Kecil */}
                 {!showMascotDialog && (
                   <span className="absolute top-0 right-0 flex items-center gap-0.5 rounded-full border border-ink bg-orange-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white shadow-md animate-bounce">
