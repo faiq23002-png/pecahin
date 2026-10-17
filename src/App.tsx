@@ -55,7 +55,7 @@ function GameHub() {
   };
 
   return (
-    <div className="min-h-screen pb-20 select-none relative">
+    <div className="min-h-screen pb-36 select-none relative">
       {/* Background Panggung Game Pasar */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
         <img

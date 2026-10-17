@@ -26,11 +26,14 @@ export function BottomNav() {
     <nav
       aria-label="Navigasi utama"
       className="fixed inset-x-0 bottom-0 z-40 wood-plank border-t-2 border-[#451a03] select-none shadow-[0_-4px_12px_rgba(0,0,0,0.35)]"
+      style={{
+        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 14px)",
+      }}
     >
       {/* Listel atas emas kayu antik berkilau */}
       <div className="h-0.5 w-full bg-gradient-to-r from-amber-600 via-yellow-300 to-amber-600 opacity-80" />
 
-      <div className="mx-auto grid max-w-md grid-cols-5 px-1 py-1">
+      <div className="mx-auto grid max-w-md grid-cols-5 px-1 pt-1.5 pb-1.5">
         {TABS.map((t) => {
           const active = isTabActive(t.id, route);
           const Icon = t.icon;

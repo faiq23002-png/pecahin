@@ -467,7 +467,7 @@ export default function RaporCetak() {
         </div>
       </div>
 
-      <div className="print:hidden w-full h-16" />
+      <div className="print:hidden w-full h-24" />
       <BottomNav />
     </div>
   );

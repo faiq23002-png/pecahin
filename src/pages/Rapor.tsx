@@ -50,7 +50,7 @@ export default function Rapor() {
   };
 
   return (
-    <div className="min-h-screen bg-krim pb-20">
+    <div className="min-h-screen bg-krim pb-36">
       <PageBoothHeader
         title="RAPOR BELAJAR PASAR"
         subtitle={`${profil.nama} · ⭐ ${poin}/100 poin`}

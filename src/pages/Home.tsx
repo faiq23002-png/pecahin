@@ -324,7 +324,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen pb-28 select-none relative">
+    <div className="min-h-screen pb-36 select-none relative">
       {/* Background Pasar Beranda */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
         <img
@@ -792,7 +792,10 @@ export default function Home() {
 
       {/* Toast ringan pengganti alert() */}
       {toast && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center px-4">
+        <div
+          className="pointer-events-none fixed inset-x-0 z-50 flex justify-center px-4"
+          style={{ bottom: "calc(4.5rem + max(env(safe-area-inset-bottom, 0px), 14px))" }}
+        >
           <div role="status" className="animate-pop rounded-full border-2 border-ink bg-ink px-4 py-2 text-sm font-bold text-white shadow-lg">
             {toast}
           </div>
@@ -812,7 +815,10 @@ export default function Home() {
       )}
 
       {/* ================= FLOATING MASKOT PENDAMPING (KANAN BAWAH) ================= */}
-      <div className={`fixed bottom-20 z-50 select-none pointer-events-auto ${isMascotMinimized ? "right-0" : "right-3"}`}>
+      <div
+        className={`fixed z-50 select-none pointer-events-auto ${isMascotMinimized ? "right-0" : "right-3"}`}
+        style={{ bottom: "calc(4.5rem + max(env(safe-area-inset-bottom, 0px), 14px))" }}
+      >
         {isMascotMinimized ? (
           /* Tombol Panah < Nempel di Pojok Kanan Layar Tanpa Celah */
           <button

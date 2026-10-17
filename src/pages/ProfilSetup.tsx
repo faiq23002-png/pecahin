@@ -39,7 +39,7 @@ export default function ProfilSetup() {
   ];
 
   return (
-    <div className="min-h-screen pb-14 select-none relative">
+    <div className="min-h-screen pb-24 select-none relative">
       {/* Background Pasar Beranda */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
         <img

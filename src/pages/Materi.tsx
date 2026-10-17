@@ -150,7 +150,7 @@ export default function Materi() {
   })();
 
   return (
-    <div className="min-h-screen pb-28 select-none relative">
+    <div className="min-h-screen pb-36 select-none relative">
       {/* Background Pasar Tradisional */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
         <img

@@ -67,7 +67,7 @@ export default function Pengaturan() {
   };
 
   return (
-    <div className="min-h-screen bg-krim pb-24 select-none relative">
+    <div className="min-h-screen bg-krim pb-36 select-none relative">
       <PageBoothHeader
         title="PENGATURAN TOKO"
         subtitle="Atur suara, karakter & mode demo"

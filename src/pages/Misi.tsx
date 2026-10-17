@@ -17,7 +17,7 @@ export default function Misi() {
   const misiSelesai = today.soalDijawab >= target;
 
   return (
-    <div className="min-h-screen bg-krim pb-24 select-none">
+    <div className="min-h-screen bg-krim pb-36 select-none">
       <PageBoothHeader
         title="PAPAN MISI PASAR"
         subtitle="Selesaikan target harian lapak!"
