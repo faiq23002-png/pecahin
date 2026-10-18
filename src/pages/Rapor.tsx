@@ -183,30 +183,41 @@ export default function Rapor() {
 
         <button
           onClick={() => setShowConfirmReset(true)}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-200 bg-red-50 py-3 font-display text-sm font-bold text-red-600 shadow-sm transition active:scale-95 hover:bg-red-100"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-300/80 bg-red-100/70 py-3 font-display text-sm font-extrabold text-red-800 shadow-[0_2px_0_#b91c1c] transition active:translate-y-[1px] active:shadow-none hover:bg-red-100"
         >
-          <span>🔄</span>
-          <span>Reset Progres Belajar</span>
+          <span>🧹</span>
+          <span>Bersihkan Data & Reset Lapak</span>
         </button>
       </div>
 
       <InfoModalCard
         isOpen={showConfirmReset}
         onClose={() => setShowConfirmReset(false)}
-        title="KONFIRMASI RESET"
-        icon="⚠️"
+        title="BERSIHKAN LAPAK"
+        icon="🧹"
         type="danger"
-        confirmText="Ya, Reset Semua"
-        cancelText="Batal"
+        confirmText="Ya, Bersihkan Lapak"
+        cancelText="Batal, Tetap Buka"
         onConfirm={executeReset}
       >
-        <div className="text-center space-y-2">
-          <p className="font-bold text-slate-800 text-sm">
-            Apakah kamu yakin ingin mereset seluruh progres & data di aplikasi?
-          </p>
-          <p className="text-xs text-red-600 font-semibold bg-red-50 p-2 rounded-xl border border-red-200">
-            Semua bintang, koin, stiker, dan riwayat belajar akan dihapus bersih.
-          </p>
+        <div className="text-center space-y-3">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-amber-400 bg-amber-100/90 text-3xl shadow-inner">
+            🧺
+          </div>
+          <div className="space-y-1">
+            <h4 className="font-display text-base font-black text-[#78350f]">
+              Mulai Petualangan Dari Awal?
+            </h4>
+            <p className="text-xs font-bold leading-relaxed text-[#78350f]/80">
+              Wah Saudagar! Apakah kamu yakin ingin membongkar lapak dan menghapus seluruh progres belajar?
+            </p>
+          </div>
+          <div className="flex items-start gap-2 rounded-xl border-2 border-red-300 bg-red-50/90 p-2.5 text-left text-xs font-bold text-red-800 shadow-xs">
+            <span className="shrink-0 text-sm">⚠️</span>
+            <span>
+              Seluruh <b>koin emas</b>, <b>bintang</b>, <b>koleksi souvenir</b>, dan <b>riwayat rapor</b> akan dihapus bersih.
+            </span>
+          </div>
         </div>
       </InfoModalCard>
 

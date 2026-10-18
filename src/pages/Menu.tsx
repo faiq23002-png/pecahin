@@ -169,22 +169,31 @@ export default function Menu() {
         </section>
       </div>
 
-      <InfoModalCard isOpen={bantuan} onClose={() => setBantuan(false)} title="PANDUAN PECAH-IN" icon="❓" confirmText="Siap!">
-        <div className="space-y-2 text-sm font-semibold text-slate-700">
-          <p>1. Buka <b>Lapak Pasar</b>: Ayo Belajar → Ayo Coba → Ayo Latihan.</p>
-          <p>2. Kerjakan <b>10 soal</b> — progres tersimpan otomatis.</p>
-          <p>3. Mainkan <b>Game</b> visual & tukar koin di menu <b>Toko</b>.</p>
+      <InfoModalCard isOpen={bantuan} onClose={() => setBantuan(false)} title="PANDUAN PASAR" icon="📜" confirmText="Siap Berpetualang!">
+        <div className="space-y-2.5 text-xs font-bold text-[#78350f]">
+          <div className="flex items-center gap-2.5 rounded-xl border border-amber-300 bg-amber-50/90 p-2.5 shadow-2xs">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-amber-600 font-display font-black text-white">1</span>
+            <span>Jelajahi <b>3 Lapak Pasar</b>: Ayo Belajar → Ayo Coba → Ayo Latihan.</span>
+          </div>
+          <div className="flex items-center gap-2.5 rounded-xl border border-teal-300 bg-teal-50/90 p-2.5 shadow-2xs">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-teal-700 font-display font-black text-white">2</span>
+            <span>Kerjakan <b>10 Soal</b> di setiap lapak untuk membuka petualangan berikutnya.</span>
+          </div>
+          <div className="flex items-center gap-2.5 rounded-xl border border-orange-300 bg-orange-50/90 p-2.5 shadow-2xs">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-orange-600 font-display font-black text-white">3</span>
+            <span>Raih koin emas untuk belanja di <b>Toko Souvenir</b> & tingkatkan maskotmu!</span>
+          </div>
         </div>
       </InfoModalCard>
 
       <InfoModalCard
         isOpen={showConfirmReset}
         onClose={() => setShowConfirmReset(false)}
-        title="KONFIRMASI RESET"
-        icon="⚠️"
+        title="BERSIHKAN LAPAK"
+        icon="🧹"
         type="danger"
-        confirmText="Ya, Reset Semua"
-        cancelText="Batal"
+        confirmText="Ya, Bersihkan Lapak"
+        cancelText="Batal, Tetap Buka"
         onConfirm={() => {
           setShowConfirmReset(false);
           sfx("tap");
@@ -192,13 +201,24 @@ export default function Menu() {
           navigate("profil");
         }}
       >
-        <div className="text-center space-y-2">
-          <p className="font-bold text-slate-800 text-sm">
-            Yakin ingin menghapus seluruh progres belajar dan data akun?
-          </p>
-          <p className="text-xs text-red-600 font-semibold bg-red-50 p-2.5 rounded-xl border border-red-200">
-            Semua skor, bintang, item toko, dan progres lapak akan dihapus bersih, lalu kamu akan dialihkan ke form isi nama awal.
-          </p>
+        <div className="text-center space-y-3">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-amber-400 bg-amber-100/90 text-3xl shadow-inner">
+            🧺
+          </div>
+          <div className="space-y-1">
+            <h4 className="font-display text-base font-black text-[#78350f]">
+              Mulai Petualangan Dari Awal?
+            </h4>
+            <p className="text-xs font-bold leading-relaxed text-[#78350f]/80">
+              Wah Saudagar! Apakah kamu yakin ingin menghapus seluruh data akun dan progres pasar?
+            </p>
+          </div>
+          <div className="flex items-start gap-2 rounded-xl border-2 border-red-300 bg-red-50/90 p-2.5 text-left text-xs font-bold text-red-800 shadow-xs">
+            <span className="shrink-0 text-sm">⚠️</span>
+            <span>
+              Semua <b>skor</b>, <b>bintang</b>, <b>koleksi toko</b>, dan <b>progres lapak</b> akan dihapus bersih, lalu kamu akan kembali ke gerbang masuk.
+            </span>
+          </div>
         </div>
       </InfoModalCard>
 
