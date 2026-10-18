@@ -87,37 +87,37 @@ function genPenjumlahan(id: string, a: number, c: number, b: number): Soal {
 const BELUM_TAHU = () => opt("🤔 Belum tahu");
 
 export const SOAL: Soal[] = [
-  /* ============ M1 — Kenal Pecahan & Bagi Rata (Tema: Buah-Buahan 🍉🍊) ============ */
-  soal("m1q1", "m1", "visual", "konsep", "Buah semangka segar dipotong 4 bagian sama besar, 3 bagian diarsir. Pecahannya?", "3/4", [
+  /* ============ M1 — Kenal Pecahan & Bagi Rata (Tema: Toko Buah Segar 🍉🍊🍎🍈🐲) ============ */
+  soal("m1q1", "m1", "visual", "konsep", "Buah semangka segar di toko buah dipotong 4 bagian sama besar, 3 bagian diarsir. Pecahannya?", "3/4", [
     opt("3/4"), opt("1/4", "M1A"), opt("4/3", "M1B"), opt("3/3", "M1C"),
   ], { visual: { shapes: [{ kind: "semangka", n: 4, k: 3 }] } }),
-  soal("m1q2", "m1", "visual", "konsep", "Buah jeruk segar dipotong 6 bagian sama besar, 2 bagian diarsir. Pecahannya?", "2/6", [
+  soal("m1q2", "m1", "visual", "konsep", "Buah jeruk manis dipotong 6 bagian sama besar, 2 bagian diarsir. Pecahannya?", "2/6", [
     opt("2/6"), opt("4/6", "M1A"), opt("6/2", "M1B"), opt("3/6", "M1C"),
   ], { visual: { shapes: [{ kind: "jeruk", n: 6, k: 2 }] } }),
-  soal("m1q3", "m1", "arsir", "konsep", "Arsirlah 3 dari 8 bagian buah semangka segar!", "3 dari 8", [
+  soal("m1q3", "m1", "arsir", "konsep", "Arsirlah 3 dari 8 bagian buah melon segar di toko buah!", "3 dari 8", [
     opt("3 dari 8"), opt("5 dari 8", "M1A"), opt("8 dari 3", "M1B"), BELUM_TAHU(),
-  ], { interaktif: true, visual: { shapes: [{ kind: "semangka", n: 8, k: 0 }] } }),
-  soal("m1q4", "m1", "konsep", "konsep", "Pada pecahan 3/5 potong semangka, angka 5 disebut…?", "penyebut", [
+  ], { interaktif: true, visual: { shapes: [{ kind: "melon", n: 8, k: 0 }] } }),
+  soal("m1q4", "m1", "konsep", "konsep", "Pada pecahan 3/5 potong apel merah, angka 5 disebut…?", "penyebut", [
     opt("penyebut"), opt("pembilang", "M1B"), opt("hasil", "M1C"), BELUM_TAHU(),
-  ], { visual: { shapes: [{ kind: "semangka", n: 5, k: 3 }] } }),
-  soal("m1q5", "m1", "bagi_rata", "konsep", "Buah mana yang dipotong menjadi 4 bagian SAMA BESAR?", "4 bagian sama besar", [
-    opt("bukan sama besar", "M1D", { kind: "semangka", parts: 4, equal: false }),
-    opt("4 bagian sama besar", undefined, { kind: "semangka", parts: 4, equal: true }),
-    opt("3 bagian sama besar", "M1C", { kind: "jeruk", parts: 3, equal: true }),
+  ], { visual: { shapes: [{ kind: "apel", n: 5, k: 3 }] } }),
+  soal("m1q5", "m1", "bagi_rata", "konsep", "Buah naga mana yang dipotong menjadi 4 bagian SAMA BESAR?", "4 bagian sama besar", [
+    opt("bukan sama besar", "M1D", { kind: "naga", parts: 4, equal: false }),
+    opt("4 bagian sama besar", undefined, { kind: "naga", parts: 4, equal: true }),
+    opt("3 bagian sama besar", "M1C", { kind: "apel", parts: 3, equal: true }),
   ]),
   soal("m1q6", "m1", "bagi_rata", "konsep", "Buah jeruk dipotong 2 tapi ukurannya tidak sama besar. Apakah tiap bagian = 1/2?", "Tidak, harus sama besar", [
     opt("Tidak, harus sama besar"), opt("Ya, tetap 1/2", "M1D"), opt("Ya, asal sudah dibagi 2", "M1C"), BELUM_TAHU(),
   ], { visual: { shapes: [{ kind: "jeruk", n: 2, k: 1 }] } }),
-  soal("m1q7", "m1", "visual", "konsep", "Buah semangka dibagi 8 bagian sama besar, 5 diarsir. Pecahannya?", "5/8", [
+  soal("m1q7", "m1", "visual", "konsep", "Buah melon madu dibagi 8 bagian sama besar, 5 diarsir. Pecahannya?", "5/8", [
     opt("5/8"), opt("3/8", "M1A"), opt("8/5", "M1B"), BELUM_TAHU(),
-  ], { visual: { shapes: [{ kind: "semangka", n: 8, k: 5 }] } }),
-  soal("m1q8", "m1", "arsir", "konsep", "Arsirlah 2 dari 6 bagian buah jeruk segar!", "2 dari 6", [
+  ], { visual: { shapes: [{ kind: "melon", n: 8, k: 5 }] } }),
+  soal("m1q8", "m1", "arsir", "konsep", "Arsirlah 2 dari 6 bagian buah apel segar!", "2 dari 6", [
     opt("2 dari 6"), opt("4 dari 6", "M1A"), opt("6 dari 2", "M1B"), BELUM_TAHU(),
-  ], { interaktif: true, visual: { shapes: [{ kind: "jeruk", n: 6, k: 0 }] } }),
-  soal("m1q9", "m1", "konsep", "konsep", "Pada pecahan 2/7 potong semangka, angka 2 disebut…?", "pembilang", [
+  ], { interaktif: true, visual: { shapes: [{ kind: "apel", n: 6, k: 0 }] } }),
+  soal("m1q9", "m1", "konsep", "konsep", "Pada pecahan 2/7 potong buah naga, angka 2 disebut…?", "pembilang", [
     opt("pembilang"), opt("penyebut", "M1B"), opt("jumlah seluruh bagian", "M1C"), BELUM_TAHU(),
-  ], { visual: { shapes: [{ kind: "semangka", n: 7, k: 2 }] } }),
-  soal("m1q10", "m1", "cerita", "verbal", "Ibu memotong semangka jadi 3 potong sama besar. Dina ambil 1 potong. Berapa bagian semangka Dina?", "1/3", [
+  ], { visual: { shapes: [{ kind: "naga", n: 7, k: 2 }] } }),
+  soal("m1q10", "m1", "cerita", "verbal", "Ibu membeli buah semangka di toko buah lalu memotongnya jadi 3 potong sama besar. Dina ambil 1 potong. Berapa bagian semangka Dina?", "1/3", [
     opt("1/3"), opt("3/1", "M1E"), opt("2/3", "M1A"), opt("semua potong", "M3C"),
   ], { kataKunci: ["memotong"], visual: { shapes: [{ kind: "semangka", n: 3, k: 1 }] } }),
 
@@ -258,12 +258,12 @@ export interface MateriPelajaran {
 export const PELAJARAN: Record<string, MateriPelajaran> = {
   m1: {
     belajar: [
-      { judul: "Bagian dari Keseluruhan", teks: "Pecahan artinya bagian dari sesuatu yang utuh. Semangka dipotong 4 sama besar → tiap potong = 1/4." },
+      { judul: "Bagian dari Keseluruhan", teks: "Pecahan artinya bagian dari sesuatu yang utuh. Di Toko Buah, buah utuh (semangka, jeruk, apel, melon, buah naga) dipotong sama besar → tiap potong = pecahan adil." },
       { judul: "Bagi Sama Besar", teks: "Semua bagian harus SAMA BESAR. Kalau ukurannya beda-beda, itu bukan pecahan." },
       { judul: "Pembilang & Penyebut", teks: "Angka atas = pembilang (bagian yang diambil/diarsir). Angka bawah = penyebut (jumlah semua bagian)." },
     ],
     coba: [
-      { judul: "Bagi & Arsir", teks: "Pilih berapa bagian (2–8), lalu arsir sebagian. Temukan pecahan 1/2, 1/3, dan 1/4." },
+      { judul: "Pilih Buah & Bagi Rata", teks: "Pilih aneka buah di toko buah, tentukan jumlah potongan (2–8), lalu arsir sebagian untuk menemukan pecahan 1/2, 1/3, dan 1/4." },
     ],
   },
   m2: {

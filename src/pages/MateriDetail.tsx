@@ -23,6 +23,14 @@ import { Fraction3DSlice } from "@/components/Fraction3DSlice";
 
 const OBJ: Record<string, ObjKind> = { m1: "semangka", m2: "kue-tart", m3: "kue-batang" };
 
+export const FRUITS: Array<{ id: ObjKind; name: string; icon: string }> = [
+  { id: "semangka", name: "Semangka", icon: "🍉" },
+  { id: "jeruk", name: "Jeruk", icon: "🍊" },
+  { id: "apel", name: "Apel", icon: "🍎" },
+  { id: "melon", name: "Melon", icon: "🍈" },
+  { id: "naga", name: "Buah Naga", icon: "🐲" },
+];
+
 export default function MateriDetail({
   materiId,
   initialTahap,
@@ -42,8 +50,8 @@ export default function MateriDetail({
         id: materiId,
         route: `materi${mat.urutan}`,
         nama: mat.judul,
-        sub: `Lapak Materi ${mat.urutan}`,
-        emoji: materiId === "m1" ? "🍉" : materiId === "m2" ? "🍰" : "📜",
+        sub: materiId === "m1" ? "Lapak 1 · Toko Buah Segar" : `Lapak Materi ${mat.urutan}`,
+        emoji: materiId === "m1" ? "🧺" : materiId === "m2" ? "🍰" : "📜",
         waktu: new Date().toISOString(),
       });
     }
@@ -180,18 +188,49 @@ export default function MateriDetail({
 }
 
 function BelajarM1({ pel }: { pel: any }) {
+  const [selectedFruit, setSelectedFruit] = useState<ObjKind>("semangka");
   const [k1, setK1] = useState(1);
   const [equal, setEqual] = useState(true);
   const [highlight, setHighlight] = useState<"pembilang" | "penyebut" | null>("pembilang");
 
+  const curFruit = FRUITS.find((f) => f.id === selectedFruit) ?? FRUITS[0];
+
   return (
     <div className="flex flex-col gap-4">
       {/* Kartu 1: Bagian dari Keseluruhan */}
-      <StallCard icon="🍉" title={pel.belajar[0].judul} tone="teal">
+      <StallCard icon="🧺" title="Etalase Toko Buah Segar" tone="teal">
         <p className="text-sm font-medium text-ink mb-3">{pel.belajar[0].teks}</p>
 
+        {/* Pemilih Buah di Toko Buah */}
+        <div className="mb-3.5 rounded-2xl bg-amber-50/80 p-3 border border-amber-200">
+          <div className="text-xs font-black text-amber-950 mb-2 flex items-center gap-1.5">
+            <span className="text-sm">🧺</span>
+            <span>Pilih Aneka Buah di Toko:</span>
+          </div>
+          <div className="grid grid-cols-5 gap-1.5">
+            {FRUITS.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => {
+                  setSelectedFruit(f.id);
+                  sfx("pop");
+                }}
+                className={`flex flex-col items-center justify-center gap-0.5 rounded-xl py-1.5 px-1 text-xs font-black transition border ${
+                  selectedFruit === f.id
+                    ? "bg-amber-400 text-amber-950 border-amber-500 shadow-sm scale-105"
+                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                }`}
+              >
+                <span className="text-lg leading-none">{f.icon}</span>
+                <span className="text-[10px] font-bold truncate max-w-full">{f.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="rounded-2xl bg-teal-50/80 p-3 border border-teal-200 flex flex-col items-center">
-          <div className="text-xs font-bold text-teal-800 mb-2">Cobalah Ubah Bagian Terarsir:</div>
+          <div className="text-xs font-bold text-teal-800 mb-2">Cobalah Ubah Bagian Terarsir ({curFruit.name}):</div>
           <div className="flex gap-1.5 mb-3">
             {[1, 2, 3, 4].map((v) => (
               <button
@@ -211,6 +250,8 @@ function BelajarM1({ pel }: { pel: any }) {
           {/* Visual 3D Interaktif Three.js dengan Swipe Potong Pisau */}
           <div className="w-full flex flex-col items-center">
             <Fraction3DSlice
+              key={`${selectedFruit}-${k1}`}
+              kind={selectedFruit}
               n={4}
               k={k1}
               onSliceCut={() => {
@@ -221,7 +262,7 @@ function BelajarM1({ pel }: { pel: any }) {
             <div className="mt-2 text-center bg-white py-2 px-4 rounded-2xl border border-teal-200 shadow-sm w-full">
               <div className="font-display text-2xl font-extrabold text-teal-700">{k1}/4 Bagian</div>
               <div className="text-xs font-bold text-slate-600">
-                {k1} dari 4 potong semangka 3D terangkat keluar
+                {k1} dari 4 potong {curFruit.name.toLowerCase()} 3D terangkat keluar
               </div>
             </div>
           </div>
@@ -254,14 +295,14 @@ function BelajarM1({ pel }: { pel: any }) {
 
           <div className="grid grid-cols-2 items-center gap-3">
             <div className="h-28">
-              <BagiVisual kind="kue-tart" parts={4} equal={equal} />
+              <BagiVisual kind={selectedFruit} parts={4} equal={equal} />
             </div>
             <div className={`p-3 rounded-2xl text-xs font-bold border ${equal ? "bg-green-50 border-green-300 text-green-800" : "bg-red-50 border-red-300 text-red-800"
               }`}>
               {equal ? (
                 <div>
                   <div className="text-sm font-extrabold mb-1">✅ INI PECAHAN</div>
-                  Setiap potongan persis <strong>1/4 sama besar</strong>.
+                  Setiap potongan {curFruit.name.toLowerCase()} persis <strong>1/4 sama besar</strong>.
                 </div>
               ) : (
                 <div>
@@ -309,18 +350,18 @@ function BelajarM1({ pel }: { pel: any }) {
 
             {/* Shape Visual */}
             <div className="h-24 w-24">
-              <FractionShape kind="semangka" n={4} k={highlight === "penyebut" ? 4 : 3} />
+              <FractionShape kind={selectedFruit} n={4} k={highlight === "penyebut" ? 4 : 3} />
             </div>
           </div>
 
           <div className="mt-4 w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 text-center">
             {highlight === "pembilang" ? (
               <span className="text-amber-900">
-                ⭐ <strong>Pembilang (3)</strong> = Angka atas. Jumlah bagian yang diarsir/diambil (3 potong).
+                ⭐ <strong>Pembilang (3)</strong> = Angka atas. Jumlah bagian {curFruit.name.toLowerCase()} yang diarsir/diambil (3 potong).
               </span>
             ) : (
               <span className="text-teal-800">
-                📦 <strong>Penyebut (4)</strong> = Angka bawah. Jumlah SELURUH potongan utuh (4 potong).
+                📦 <strong>Penyebut (4)</strong> = Angka bawah. Jumlah SELURUH potongan {curFruit.name.toLowerCase()} utuh (4 potong).
               </span>
             )}
           </div>
@@ -630,8 +671,11 @@ function Belajar({ materiId, onLanjut }: { materiId: string; onLanjut: () => voi
 function Coba({ materiId, onLanjut }: { materiId: string; onLanjut: () => void }) {
   const pel = PELAJARAN[materiId];
   const kind = OBJ[materiId];
+  const [selectedFruit, setSelectedFruit] = useState<ObjKind>("semangka");
   const [n, setN] = useState(4);
   const [k, setK] = useState(1);
+
+  const activeKind = materiId === "m1" ? selectedFruit : kind;
 
   // Materi 3 (Penjumlahan) pakai konsep "Gabungkan Potongan"
   if (materiId === "m3") return <CobaM3 onLanjut={onLanjut} />;
@@ -642,7 +686,36 @@ function Coba({ materiId, onLanjut }: { materiId: string; onLanjut: () => void }
         <p className="text-sm font-medium text-ink">{pel.coba[0].teks}</p>
       </StallCard>
 
-      <StallCard icon="🍽️" title="Bagi & Arsir" tone="orange">
+      <StallCard icon="🍽️" title={materiId === "m1" ? "Meja Potong Toko Buah" : "Bagi & Arsir"} tone="orange">
+        {materiId === "m1" && (
+          <div className="mb-3.5 rounded-2xl bg-amber-50/80 p-3 border border-amber-200">
+            <div className="text-xs font-black text-amber-950 mb-2 flex items-center gap-1.5">
+              <span className="text-sm">🧺</span>
+              <span>Pilih Buah yang Ingin Dipotong:</span>
+            </div>
+            <div className="grid grid-cols-5 gap-1.5">
+              {FRUITS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedFruit(f.id);
+                    sfx("pop");
+                  }}
+                  className={`flex flex-col items-center justify-center gap-0.5 rounded-xl py-1.5 px-1 text-xs font-black transition border ${
+                    selectedFruit === f.id
+                      ? "bg-amber-400 text-amber-950 border-amber-500 shadow-sm scale-105"
+                      : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                  }`}
+                >
+                  <span className="text-lg leading-none">{f.icon}</span>
+                  <span className="text-[10px] font-bold truncate max-w-full">{f.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="text-sm font-bold text-ink">Bagi jadi berapa?</div>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {[2, 3, 4, 5, 6, 8].map((v) => (
@@ -675,7 +748,7 @@ function Coba({ materiId, onLanjut }: { materiId: string; onLanjut: () => void }
           ))}
         </div>
         <div className="mt-4">
-          <Fraction3DSlice kind={kind} n={n} k={k} allowSwipeCut={false} className="w-full" />
+          <Fraction3DSlice key={`${activeKind}-${n}-${k}`} kind={activeKind} n={n} k={k} allowSwipeCut={false} className="w-full" />
           <div className="mt-1 text-center">
             <div className="font-display text-4xl font-extrabold text-orange-600">{k}/{n}</div>
             <div className="text-xs font-semibold text-muted">bagian terarsir</div>
@@ -860,7 +933,7 @@ function SoalVisual({ soal }: { soal: Soal }) {
     const s = soal.visual.shapes[0];
     return (
       <div className="mt-3 rounded-2xl bg-slate-50 p-2">
-        <Fraction3DSlice kind={s.kind} n={s.n} k={s.k} allowSwipeCut={false} className="w-full" />
+        <Fraction3DSlice key={`${s.kind}-${s.n}-${s.k}`} kind={s.kind} n={s.n} k={s.k} allowSwipeCut={false} className="w-full" />
       </div>
     );
   }

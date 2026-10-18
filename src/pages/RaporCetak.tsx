@@ -42,7 +42,7 @@ export default function RaporCetak() {
     { id: "g1", nama: "Lapak 1: Bagi Rata Buah 🍉", max: POIN_GAME_MAX["g1"] ?? 15 },
     { id: "g2", nama: "Lapak 2: Banding & Jodoh Kue 🍰", max: POIN_GAME_MAX["g2"] ?? 15 },
     { id: "g3", nama: "Lapak 3: Pesanan Tambah Porsi 🧺", max: POIN_GAME_MAX["g3"] ?? 15 },
-    { id: "gCampuran", nama: "Panggung Utama: Grand Bazaar 🏆", max: POIN_GAME_MAX["gCampuran"] ?? 25 },
+    { id: "gCampuran", nama: "Panggung Utama: Grand Bazar 🏆", max: POIN_GAME_MAX["gCampuran"] ?? 25 },
   ];
 
   const totalPoinGame = poinGame(game);

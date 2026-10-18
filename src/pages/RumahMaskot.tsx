@@ -28,7 +28,7 @@ export default function RumahMaskot() {
     1: "Murid magang lapak pasar yang baru mulai belajar mengenal potongan pecahan yang adil.",
     2: "Detektif cilik pasar yang teliti membandingkan ukuran dan menemukan pecahan senilai.",
     3: "Juragan lapak terpercaya yang ahli menimbang porsi belanjaan dan menguasai transaksi pasar.",
-    4: "Profesor & Sultan Pecahan legendaris yang menguasai seluruh panggung Grand Bazaar!",
+    4: "Profesor & Sultan Pecahan legendaris yang menguasai seluruh panggung Grand Bazar!",
   };
 
   return (

@@ -21,7 +21,7 @@ export type SoalTipe =
 export type StatusTahap = "terkunci" | "terbuka" | "selesai";
 export type StatusMateri = "terkunci" | "terbuka" | "selesai";
 
-export type ObjKind = "semangka" | "jeruk" | "kue-tart" | "pizza" | "roti" | "cokelat" | "keju" | "kue-batang";
+export type ObjKind = "semangka" | "jeruk" | "apel" | "melon" | "naga" | "kue-tart" | "pizza" | "roti" | "cokelat" | "keju" | "kue-batang";
 
 /** Visual untuk soal (gambar objek pecahan). */
 export interface SoalVisual {

@@ -21,7 +21,7 @@ import { Awning, HangingSign } from "@/components/MarketProps";
 import { GameLoadingScreen } from "@/components/GameLoadingScreen";
 
 const ROUNDS = 10;
-const BUAH: ObjKind[] = ["semangka", "jeruk", "kue-tart", "pizza", "roti", "cokelat", "keju", "kue-batang"];
+const BUAH: ObjKind[] = ["semangka", "jeruk", "apel", "melon", "naga", "kue-tart", "pizza", "roti", "cokelat", "keju", "kue-batang"];
 
 function randomBuah(): ObjKind {
   return BUAH[Math.floor(Math.random() * BUAH.length)];
@@ -124,7 +124,22 @@ function genArsir(usedKeys: Set<string>): Tugas | null {
   if (usedKeys.has(key)) return null;
   usedKeys.add(key);
 
-  const itemNama = kind === "semangka" ? "semangka" : kind === "pizza" ? "pizza" : kind === "roti" ? "roti" : "kue";
+  const itemNama =
+    kind === "semangka"
+      ? "semangka"
+      : kind === "jeruk"
+      ? "jeruk"
+      : kind === "apel"
+      ? "apel"
+      : kind === "melon"
+      ? "melon"
+      : kind === "naga"
+      ? "buah naga"
+      : kind === "pizza"
+      ? "pizza"
+      : kind === "roti"
+      ? "roti"
+      : "kue";
   return {
     id: key,
     mode: "arsir",

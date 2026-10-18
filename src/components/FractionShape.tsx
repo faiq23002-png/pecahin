@@ -15,6 +15,9 @@ interface Cfg {
 const CFG: Record<ObjKind, Cfg> = {
   semangka: { shape: "circle", flesh: "#E11D48", fade: "#FFE4E6", rind: "#15803D", ringW: 9 },
   jeruk: { shape: "circle", flesh: "#F97316", fade: "#FFEDD5", rind: "#C2410C", ringW: 8 },
+  apel: { shape: "circle", flesh: "#FEF08A", fade: "#FEFCE8", rind: "#DC2626", ringW: 8 },
+  melon: { shape: "circle", flesh: "#84CC16", fade: "#ECFCCB", rind: "#166534", ringW: 9 },
+  naga: { shape: "circle", flesh: "#D946EF", fade: "#FCE7F3", rind: "#059669", ringW: 9 },
   "kue-tart": { shape: "circle", flesh: "#EC4899", fade: "#FCE7F3", rind: "#A16207", ringW: 8 },
   pizza: { shape: "circle", flesh: "#FACC15", fade: "#FEF9C3", rind: "#92400E", ringW: 10 },
   roti: { shape: "rect", flesh: "#D97706", fade: "#FEF3C7", rind: "#B45309" },
@@ -50,6 +53,22 @@ function CircleObj({ kind, n, k, hatch }: { kind: ObjKind; n: number; k: number;
             <circle cx="60" cy="60" r="4" fill="#FDBA74" />
           </>
         );
+      case "apel":
+        return (
+          <>
+            <path d="M60 9 q14 -8 22 -2 q-10 8 -22 2Z" fill="#15803D" />
+            <ellipse cx={cx - 5} cy={cy} rx="1.5" ry="3" fill="#451A03" />
+            <ellipse cx={cx + 5} cy={cy} rx="1.5" ry="3" fill="#451A03" />
+          </>
+        );
+      case "melon":
+        return [[-10, -10, -30], [10, -10, 30], [-10, 10, -150], [10, 10, 150]].map(([x, y, rot], i) => (
+          <ellipse key={i} cx={cx + x} cy={cy + y} rx="1.5" ry="2.8" fill="#FDF08A" stroke="#CA8A04" strokeWidth="0.5" transform={`rotate(${rot} ${cx + x} ${cy + y})`} />
+        ));
+      case "naga":
+        return [[-14, -6, 0], [12, -12, 10], [-8, 14, -20], [14, 8, 25], [0, -16, 0], [0, 16, 0], [-14, 6, 15]].map(([x, y, rot], i) => (
+          <circle key={i} cx={cx + x} cy={cy + y} r="1.3" fill="#18181B" />
+        ));
       case "kue-tart":
         return (
           <>

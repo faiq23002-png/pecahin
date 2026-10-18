@@ -15,7 +15,7 @@ import { IconLock, IconCoin, IconStar } from "@/components/icons";
 import { Awning, Bunting, HangingSign, PriceTag, ClosedSign, Crate, Counter } from "@/components/MarketProps";
 
 const OBJ: Record<string, ObjKind> = { m1: "semangka", m2: "kue-tart", m3: "kue-batang" };
-const LAPAK_EMOJI: Record<string, string> = { m1: "🍉", m2: "🍰", m3: "📜" };
+const LAPAK_EMOJI: Record<string, string> = { m1: "🧺", m2: "🍰", m3: "📜" };
 const LAPAK_SHORT: Record<string, string> = { m1: "Mengenal Pecahan", m2: "Pecahan Senilai", m3: "Penjumlahan" };
 
 /** Warna aksen per lapak/game — solid, tanpa gradien. */
@@ -296,7 +296,7 @@ export default function Home() {
       { id: "g1", nama: "Bagi Rata", desc: "Potong buah sama besar", emoji: "🍉", route: "game-bagi-rata", terkunci: !progress["m1"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 1", skor: game["g1"]?.skorTerbaik ?? 0, tone: "teal" },
       { id: "g2", nama: "Banding & Senilai", desc: "Cari pasangan senilai", emoji: "🍰", route: "game-banding-jodoh", terkunci: !progress["m2"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 2", skor: game["g2"]?.skorTerbaik ?? 0, tone: "rose" },
       { id: "g3", nama: "Tambah Porsi", desc: "Jumlahkan pesanan", emoji: "🧺", route: "game-lapak-jualan", terkunci: !progress["m3"]?.selesai && !modeJuri, syarat: "Selesaikan Lapak 3", skor: game["g3"]?.skorTerbaik ?? 0, tone: "violet" },
-      { id: "gCampuran", nama: "Grand Bazaar", desc: "Tantangan semua materi", emoji: "🏆", route: "game-campuran", terkunci: !semuaSelesai(progress) && !modeJuri, syarat: "Selesaikan semua lapak", skor: game["gCampuran"]?.skorTerbaik ?? 0, tone: "teal" },
+      { id: "gCampuran", nama: "Grand Bazar", desc: "Tantangan semua materi", emoji: "🏆", route: "game-campuran", terkunci: !semuaSelesai(progress) && !modeJuri, syarat: "Selesaikan semua lapak", skor: game["gCampuran"]?.skorTerbaik ?? 0, tone: "teal" },
     ];
   const poinGameTotal = poinGame(game);
 

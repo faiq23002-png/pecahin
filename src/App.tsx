@@ -48,7 +48,7 @@ function GameHub() {
     },
     gCampuran: {
       emoji: "🏆",
-      sellerRole: "Panggung Utama Grand Bazaar Pasar",
+      sellerRole: "Panggung Utama Grand Bazar Pasar",
       bg: "bg-amber-500",
       awning: "bg-market-awning-orange",
     },

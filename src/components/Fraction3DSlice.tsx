@@ -25,6 +25,9 @@ type Topping = "seeds" | "sesame" | "pepperoni" | "sprinkles" | "leaf" | "none";
 const KIND_3D: Record<ObjKind, { flesh: number; active: number; inner: number; outer: number; topping: Topping }> = {
   semangka: { flesh: 0xe11d48, active: 0xff1744, inner: 0xfef9c3, outer: 0x15803d, topping: "seeds" },
   jeruk: { flesh: 0xf97316, active: 0xfdba74, inner: 0xffedc5, outer: 0xc2410c, topping: "leaf" },
+  apel: { flesh: 0xfef08a, active: 0xfff9c4, inner: 0xfefce8, outer: 0xdc2626, topping: "seeds" },
+  melon: { flesh: 0x84cc16, active: 0xa3e635, inner: 0xecfccb, outer: 0x166534, topping: "seeds" },
+  naga: { flesh: 0xd946ef, active: 0xf0abfc, inner: 0xfce7f3, outer: 0x059669, topping: "seeds" },
   "kue-tart": { flesh: 0xec4899, active: 0xf472b6, inner: 0xfce7f3, outer: 0xa16207, topping: "sprinkles" },
   pizza: { flesh: 0xfacc15, active: 0xfde047, inner: 0xfef3c7, outer: 0x92400e, topping: "pepperoni" },
   roti: { flesh: 0xd97706, active: 0xf59e0b, inner: 0xfef3c7, outer: 0xb45309, topping: "sesame" },
@@ -102,7 +105,7 @@ export function Fraction3DSlice({
     const sliceAngle = (Math.PI * 2) / n;
 
     const matFlesh = new THREE.MeshStandardMaterial({ color: cfg.flesh, roughness: 0.4 });
-    const matActive = new THREE.MeshStandardMaterial({ color: cfg.active, roughness: 0.3, emissive: 0x881337, emissiveIntensity: 0.4 });
+    const matActive = new THREE.MeshStandardMaterial({ color: cfg.active, roughness: 0.3, emissive: cfg.active, emissiveIntensity: 0.35 });
     const matWhite = new THREE.MeshStandardMaterial({ color: cfg.inner, roughness: 0.6 });
     const matGreen = new THREE.MeshStandardMaterial({ color: cfg.outer, roughness: 0.5 });
     const matSeed = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.5 });

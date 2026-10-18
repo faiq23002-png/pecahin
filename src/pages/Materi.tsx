@@ -41,15 +41,15 @@ const SCROLL_TERRITORIES: TerritoryScroll[] = [
   {
     id: "m1",
     territoryNum: "WILAYAH I",
-    title: "Lembah Kebun Semangka",
-    sub: "Mengenal Pecahan & Potongan Adil",
+    title: "Lapak Toko Buah Segar",
+    sub: "Mengenal Pecahan & Potongan Aneka Buah",
     sealColor: "text-emerald-900 border-emerald-900/60 bg-emerald-200/80",
     sealBg: "from-emerald-500 to-emerald-700",
     kind: "semangka",
     stops: [
-      { materiId: "m1", tahapId: "tahapBelajar", stopNum: 1, title: "Ayo Belajar", subtitle: "Gulungan Konsep Dasar", badgeText: "Teori", icon: "📜" },
-      { materiId: "m1", tahapId: "tahapCoba", stopNum: 2, title: "Ayo Coba", subtitle: "Praktik Potong Sama Besar", badgeText: "Praktik", icon: "🍉" },
-      { materiId: "m1", tahapId: "tahapLatihan", stopNum: 3, title: "Ujian Lapak 1", subtitle: "Tantangan 10 Soal Semangka", badgeText: "Peti Harta", icon: "🧰", isBossChest: true },
+      { materiId: "m1", tahapId: "tahapBelajar", stopNum: 1, title: "Ayo Belajar", subtitle: "Etalase Buah 3D & Konsep", badgeText: "Teori", icon: "📜" },
+      { materiId: "m1", tahapId: "tahapCoba", stopNum: 2, title: "Ayo Coba", subtitle: "Praktik Potong Aneka Buah", badgeText: "Praktik", icon: "🧺" },
+      { materiId: "m1", tahapId: "tahapLatihan", stopNum: 3, title: "Ujian Lapak 1", subtitle: "Tantangan 10 Soal Toko Buah", badgeText: "Peti Harta", icon: "🧰", isBossChest: true },
     ],
   },
   {
@@ -69,7 +69,7 @@ const SCROLL_TERRITORIES: TerritoryScroll[] = [
   {
     id: "m3",
     territoryNum: "WILAYAH III",
-    title: "Benteng Bazaar Utama",
+    title: "Benteng Bazar Utama",
     sub: "Penjumlahan Pecahan & Soal Cerita",
     sealColor: "text-rose-900 border-rose-900/60 bg-rose-200/80",
     sealBg: "from-rose-500 to-rose-700",
@@ -221,7 +221,7 @@ export default function Materi() {
                   Peta {idx + 1}
                 </span>
                 <span className="mt-0.5 font-display text-xs font-black truncate w-full text-center">
-                  {idx === 0 ? "🍉 Semangka" : idx === 1 ? "🍰 Toko Kue" : "📜 Bazaar"}
+                  {idx === 0 ? "🧺 Toko Buah" : idx === 1 ? "🍰 Toko Kue" : "📜 Bazar"}
                 </span>
                 <span className="mt-1 rounded-full border border-[#78350f]/20 bg-[#78350f]/10 px-2 py-0.5 text-[9px] font-black">
                   {p?.selesai ? "✓ Tuntas" : isLocked ? "🔒 Terkunci" : `${doneCount}/3 Pos`}
@@ -404,7 +404,7 @@ export default function Materi() {
                 })}
               </div>
 
-              {/* ================= CARD HARTA KARUN UTAMA: GRAND BAZAAR ================= */}
+              {/* ================= CARD HARTA KARUN UTAMA: GRAND BAZAR ================= */}
               <div className="mt-6 border-t-2 border-dashed border-[#92400e]/40 pt-4">
                 <button
                   type="button"
@@ -430,10 +430,10 @@ export default function Materi() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
                         <span className="rounded bg-[#78350f] px-1.5 py-0.5 text-[9px] font-black text-amber-100 uppercase">
-                          Harta Utama
+                           Harta Utama
                         </span>
                         <span className="font-display text-sm font-black text-[#3e2412] truncate">
-                          Istana Grand Bazaar
+                          Istana Grand Bazar
                         </span>
                       </div>
                       <p className="text-[11px] font-bold text-[#78350f] truncate mt-0.5">
