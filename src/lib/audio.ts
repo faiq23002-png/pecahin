@@ -138,25 +138,166 @@ export function sfx(name: SfxName) {
 /* ================= Narasi soal ("Dengarkan soal") ================= */
 
 let currentSoalAudio: HTMLAudioElement | null = null;
+let currentUtterance: SpeechSynthesisUtterance | null = null;
+let currentSafetyTimeout: ReturnType<typeof setTimeout> | null = null;
+
+/**
+ * Format teks soal agar dibaca ramah dan natural oleh TTS Bahasa Indonesia
+ * (mengubah pecahan 3/4 jadi "tiga per empat", simbol +, =, dll).
+ */
+export function teksUntukSuara(teks: string): string {
+  return teks
+    // Hilangkan emoji dan simbol visual
+    .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, "")
+    // Konversi pecahan umum
+    .replace(/\b1\/2\b/g, "satu per dua")
+    .replace(/\b1\/3\b/g, "satu per tiga")
+    .replace(/\b2\/3\b/g, "dua per tiga")
+    .replace(/\b1\/4\b/g, "satu per empat")
+    .replace(/\b2\/4\b/g, "dua per empat")
+    .replace(/\b3\/4\b/g, "tiga per empat")
+    .replace(/\b1\/5\b/g, "satu per lima")
+    .replace(/\b2\/5\b/g, "dua per lima")
+    .replace(/\b3\/5\b/g, "tiga per lima")
+    .replace(/\b4\/5\b/g, "empat per lima")
+    .replace(/\b1\/6\b/g, "satu per enam")
+    .replace(/\b2\/6\b/g, "dua per enam")
+    .replace(/\b3\/6\b/g, "tiga per enam")
+    .replace(/\b4\/6\b/g, "empat per enam")
+    .replace(/\b5\/6\b/g, "lima per enam")
+    .replace(/\b1\/7\b/g, "satu per tujuh")
+    .replace(/\b2\/7\b/g, "dua per tujuh")
+    .replace(/\b1\/8\b/g, "satu per delapan")
+    .replace(/\b2\/8\b/g, "dua per delapan")
+    .replace(/\b3\/8\b/g, "tiga per delapan")
+    .replace(/\b5\/8\b/g, "lima per delapan")
+    .replace(/\b7\/8\b/g, "tujuh per delapan")
+    // Format pecahan angka umum: misalnya 5/10 -> 5 per 10
+    .replace(/(\d+)\/(\d+)/g, "$1 per $2")
+    // Simbol dan operator matematika
+    .replace(/\+/g, " ditambah ")
+    .replace(/=/g, " sama dengan ")
+    .replace(/</g, " lebih kecil dari ")
+    .replace(/>/g, " lebih besar dari ")
+    .replace(/[…\.]{2,}/g, " berapa ")
+    .replace(/:\s*/g, ", ")
+    // Rapikan spasi berlebih
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* ===== Util suara TTS: preload & pilih voice Indonesia ===== */
+let cachedVoices: SpeechSynthesisVoice[] = [];
+
+function muatVoices(): SpeechSynthesisVoice[] {
+  try {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return [];
+    const v = window.speechSynthesis.getVoices();
+    if (v && v.length) cachedVoices = v;
+  } catch {
+    /* abaikan */
+  }
+  return cachedVoices;
+}
+
+function pilihVoiceId(): SpeechSynthesisVoice | null {
+  const voices = muatVoices();
+  if (!voices.length) return null;
+  // Prioritas 1: lang id-ID
+  const id = voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("id"));
+  if (id) return id;
+  // Prioritas 2: nama mengandung "indonesia"
+  const indo = voices.find((v) => /indonesia/i.test(v.name));
+  if (indo) return indo;
+  // Prioritas 3: suara default browser
+  const def = voices.find((v) => v.default);
+  if (def) return def;
+  // Fallback: suara pertama yang tersedia
+  return voices[0];
+}
+
+// Preload suara sejak awal + tangkap event voiceschanged (voice dimuat async)
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  muatVoices();
+  window.speechSynthesis.onvoiceschanged = () => muatVoices();
+}
 
 function ttsSoal(soal: Soal, done: () => void) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    done();
+    return;
+  }
+
   try {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(soal.teks);
+    if (currentSafetyTimeout) {
+      clearTimeout(currentSafetyTimeout);
+      currentSafetyTimeout = null;
+    }
+
+    const synth = window.speechSynthesis;
+
+    // Batalkan suara lama dan pastikan tidak dalam state paused
+    synth.cancel();
+    if (synth.paused) {
+      synth.resume();
+    }
+
+    const kalimat = teksUntukSuara(soal.teks);
+    const u = new SpeechSynthesisUtterance(kalimat);
+    // Simpan referensi global untuk mencegah garbage collection oleh browser V8
+    currentUtterance = u;
+    (window as any).__lastUtterance = u;
+
     u.lang = "id-ID";
     u.rate = 0.9;
-    u.onend = done;
-    u.onerror = done;
-    speechSynthesis.speak(u);
-    // safety bila voice Indonesia tidak terpasang
-    setTimeout(done, 6000);
-  } catch {
+    u.pitch = 1.0;
+
+    // Pilih voice Indonesia secara eksplisit (fallback ke suara default bila tak ada)
+    const voice = pilihVoiceId();
+    if (voice) {
+      u.voice = voice;
+      u.lang = voice.lang || "id-ID";
+    } else {
+      console.warn("[TTS] Tidak ada voice di perangkat ini — butuh MP3 narasi di public/audio/.");
+    }
+
+    let finished = false;
+    const finish = () => {
+      if (!finished) {
+        finished = true;
+        if (currentSafetyTimeout) {
+          clearTimeout(currentSafetyTimeout);
+          currentSafetyTimeout = null;
+        }
+        currentUtterance = null;
+        done();
+      }
+    };
+
+    u.onend = finish;
+    u.onerror = (e) => {
+      console.warn("TTS Error:", e);
+      finish();
+    };
+
+    // Panggil speak() LANGSUNG secara sinkron dalam user gesture handler
+    synth.speak(u);
+    if (synth.paused) {
+      synth.resume();
+    }
+
+    // Safety timeout berbasis jumlah kata
+    const wordCount = kalimat.split(/\s+/).length;
+    const durasiMs = Math.max(5000, Math.min(25000, (wordCount / 2) * 1000 + 4000));
+    currentSafetyTimeout = setTimeout(finish, durasiMs);
+  } catch (err) {
+    console.warn("TTS Fatal:", err);
     done();
   }
 }
 
 /**
- * Putar narasi soal: MP3 utama (public/audio/<id>.mp3), TTS sebagai cadangan.
+ * Putar narasi soal: MP3 custom jika ada, atau TTS sintetis Bahasa Indonesia langsung.
  * Resolve saat selesai (atau gagal), supaya UI bisa reset state "sedang bicara".
  */
 export function playSoal(soal: Soal): Promise<void> {
@@ -169,25 +310,50 @@ export function playSoal(soal: Soal): Promise<void> {
         resolve();
       }
     };
-    const src = soal.audioPath ?? import.meta.env.BASE_URL + "audio/" + soal.id + ".mp3";
-    try {
-      const audio = new Audio(src);
-      currentSoalAudio = audio;
-      audio.onended = done;
-      audio.onerror = () => ttsSoal(soal, done);
-      audio.play().catch(() => ttsSoal(soal, done));
-    } catch {
+
+    // Jika soal memiliki rekaman audio custom eksplisit
+    if (soal.audioPath) {
+      try {
+        const audio = new Audio(soal.audioPath);
+        currentSoalAudio = audio;
+        audio.onended = () => {
+          currentSoalAudio = null;
+          done();
+        };
+        audio.onerror = () => {
+          currentSoalAudio = null;
+          ttsSoal(soal, done);
+        };
+        audio.play().catch(() => {
+          currentSoalAudio = null;
+          ttsSoal(soal, done);
+        });
+      } catch {
+        ttsSoal(soal, done);
+      }
+    } else {
+      // Langsung eksekusi TTS tanpa delay request 404 agar gesture klik browser tetap aktif
       ttsSoal(soal, done);
     }
   });
 }
 
 export function stopSoal(): void {
+  if (currentSafetyTimeout) {
+    clearTimeout(currentSafetyTimeout);
+    currentSafetyTimeout = null;
+  }
   if (currentSoalAudio) {
     currentSoalAudio.pause();
     currentSoalAudio.onended = null;
     currentSoalAudio.onerror = null;
     currentSoalAudio = null;
   }
-  if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
+  }
+  currentUtterance = null;
 }

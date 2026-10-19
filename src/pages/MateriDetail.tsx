@@ -989,6 +989,9 @@ function Latihan({ materiId }: { materiId: string }) {
     if (benarCount >= KRITERIA_SELESAI && !progress[materiId]?.selesai) {
       selesaikanMateri(materiId, benarCount, soalList.length);
     }
+    return () => {
+      stopSoal();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1116,7 +1119,18 @@ function Latihan({ materiId }: { materiId: string }) {
 
       {sudahBenar ? (
         <StallCard icon="✅" title={`Soal ${idx + 1} · Sudah Benar`} tone="teal">
-          <div className="font-display text-base font-bold text-ink"><FractionText text={soal.teks} size="md" /></div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="font-display text-base font-bold text-ink"><FractionText text={soal.teks} size="md" /></div>
+            <button
+              type="button"
+              onClick={dengarkan}
+              aria-label="Dengarkan soal"
+              aria-pressed={narasi}
+              className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition active:scale-95 ${narasi ? "bg-teal-700 text-white animate-pulse" : "bg-teal-100 text-teal-700 hover:bg-teal-200"}`}
+            >
+              <IconSound size={20} />
+            </button>
+          </div>
           {isArsir && arsirInfo ? (
             <div className="mx-auto mt-3 h-36 w-36">
               <FractionShape kind={arsirInfo.kind} n={arsirInfo.n} k={arsirInfo.target} />
